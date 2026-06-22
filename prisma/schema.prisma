@@ -1,0 +1,142 @@
+// Number Slot Game — schema (Users + Auth.js, Games, Tickets)
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum GameStatus {
+  OPEN
+  CLOSED
+  DRAWN
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum TicketOutcome {
+  PENDING
+  WON
+  LOST
+}
+
+// ---------------------------------------------------------------------------
+// Auth (NextAuth / Auth.js v5 with the Prisma adapter)
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  role          UserRole  @default(USER)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  accounts Account[]
+  sessions Session[]
+  tickets  Ticket[]
+
+  @@map("users")
+}
+
+model Account {
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@id([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// Game domain
+// ---------------------------------------------------------------------------
+
+model Game {
+  id            String     @id @default(cuid())
+  title         String
+  ticketPrice   Int        @map("ticket_price")
+  // Percentage of the collected pool paid to the holder of the winning number.
+  // The platform keeps the remainder. Default 80% => 20% house margin.
+  payoutPercent Int        @default(80) @map("payout_percent")
+  status        GameStatus @default(OPEN)
+  winningNumber Int?       @map("winning_number")
+  payoutAmount  Int?       @map("payout_amount")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  closedAt      DateTime?  @map("closed_at")
+  drawnAt       DateTime?  @map("drawn_at")
+
+  tickets Ticket[]
+
+  @@index([status, ticketPrice])
+  @@map("games")
+}
+
+model Ticket {
+  id            String        @id @default(cuid())
+  gameId        String        @map("game_id")
+  userId        String        @map("user_id")
+  slotNumber    Int           @map("slot_number")
+  pricePaid     Int           @map("price_paid")
+  paymentStatus PaymentStatus @default(PENDING) @map("payment_status")
+  paymentRef    String?       @map("payment_ref")
+  outcome       TicketOutcome @default(PENDING)
+  createdAt     DateTime      @default(now()) @map("created_at")
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Prevents two users from buying the same slot in the same session.
+  @@unique([gameId, slotNumber])
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([gameId])
+  @@map("tickets")
+}
