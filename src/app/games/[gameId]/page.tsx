@@ -175,8 +175,7 @@ export default function GamePage() {
                 {potentialPrize.toLocaleString("en-IN")}
               </p>
               <p className="text-[11.5px] text-low">
-                if all {TOTAL_SLOTS} slots sell · {WINNER_PAYOUT_PERCENT}% of pool to
-                the winner
+                if all {TOTAL_SLOTS} slots sell
               </p>
               <p className="num mt-1 text-sm font-semibold text-green">
                 Rs. {currentPoolPrize.toLocaleString("en-IN")} guaranteed right now

@@ -3,9 +3,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { GameCard } from "@/components/GameCard";
-import { apiFetch, LobbyResponse } from "@/lib/api-client";
+import { apiFetch, LobbyGame, LobbyResponse } from "@/lib/api-client";
 import { formatRs } from "@/lib/format";
 import { WINNER_PAYOUT_PERCENT } from "@/lib/payout";
+import { TICKET_PRICE_TIERS } from "@/lib/pricing";
 
 export default function LobbyPage() {
   const [data, setData] = useState<LobbyResponse | null>(null);
@@ -27,12 +28,26 @@ export default function LobbyPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Live combined prize pool: the winner's fixed 70% share of everything
-  // currently collected across all open games — real data, not a fake tick-up.
+  // Only OPEN games appear on the home page — closed/drawn games roll off
+  // automatically once the daily rotation replaces them with a fresh game.
+  const openGamesByPrice = useMemo(() => {
+    const map = new Map<number, LobbyGame[]>();
+    if (!data) return map;
+    for (const game of data.games) {
+      if (game.status !== "OPEN") continue;
+      const list = map.get(game.ticketPrice) ?? [];
+      list.push(game);
+      map.set(game.ticketPrice, list);
+    }
+    return map;
+  }, [data]);
+
+  // Live combined prize pool: the winner's fixed share of everything
+  // currently collected across today's open games — real data, not a fake tick-up.
   const liveJackpot = useMemo(() => {
     if (!data) return 0;
     const collected = data.games
-      .filter((game) => game.status !== "DRAWN")
+      .filter((game) => game.status === "OPEN")
       .reduce((sum, game) => sum + game.soldCount * game.ticketPrice, 0);
     return Math.floor((collected * WINNER_PAYOUT_PERCENT) / 100);
   }, [data]);
@@ -71,24 +86,33 @@ export default function LobbyPage() {
         </p>
       ) : null}
 
-      {data?.priceTiers.map((tier) => (
-        <section key={tier.ticketPrice} className="space-y-3">
-          <div className="mt-2 flex items-center gap-2">
-            <span className="h-[2px] w-3.5 rounded-full bg-orange" />
-            <h2 className="text-[13px] font-bold uppercase tracking-wide text-mid">
-              {formatRs(tier.ticketPrice)} Games
-            </h2>
-            <span className="ml-auto text-xs text-low">{tier.games.length} active</span>
-          </div>
-          {tier.games.map((game) => (
-            <GameCard key={game.id} game={game} />
-          ))}
-        </section>
-      ))}
+      {!loading && !error
+        ? TICKET_PRICE_TIERS.map((price) => {
+            const games = openGamesByPrice.get(price) ?? [];
+            if (games.length === 0) {
+              return null;
+            }
+            return (
+              <section key={price} className="space-y-3">
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="h-[2px] w-3.5 rounded-full bg-orange" />
+                  <h2 className="text-[13px] font-bold uppercase tracking-wide text-mid">
+                    {formatRs(price)} Games
+                  </h2>
+                  <span className="ml-auto text-xs text-low">{games.length} active</span>
+                </div>
+                {games.map((game) => (
+                  <GameCard key={game.id} game={game} />
+                ))}
+              </section>
+            );
+          })
+        : null}
 
-      {data && data.games.length === 0 ? (
+      {!loading && !error && openGamesByPrice.size === 0 ? (
         <p className="rounded-2xl border border-line bg-card p-4 text-sm text-mid">
-          No games yet. Ask an admin to create one from the Admin tab.
+          No games open right now — new games roll out automatically every
+          day. Check back soon, or ask an admin to create one.
         </p>
       ) : null}
     </AppShell>

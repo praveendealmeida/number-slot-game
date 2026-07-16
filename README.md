@@ -123,6 +123,21 @@ Chain2Pay settles only in USD/EUR/GBP/CAD and has a **per-payment minimum of rou
 
 Use a `c2p_sandbox_*` key. Create a purchase, then confirm it from the Chain2Pay dashboard (Transactions → the order → "Send Test Callback") or via `POST /api/v2/payments/:id/sandbox-confirm`. The status poll will pick up the `paid` state and lock in the slots. Because the webhook needs a public URL, on `localhost` rely on the dashboard confirm + the polling reconciliation (no public webhook required).
 
+## Daily game rotation
+
+The 5 fixed price tiers — Rs. 50, 100, 200, 500, 1000 — run themselves:
+
+- **Auto-close + auto-draw.** Any `OPEN` game older than 24 hours is automatically closed and drawn with a fair, cryptographically random winning number (`node:crypto`'s `randomInt`), using the exact same payout logic as a manual admin draw. Games that sell out early are untouched by this — those still wait for an admin's manual draw, same as before.
+- **Tier refill.** Right after that, any price tier left with zero `OPEN` games gets a fresh one created automatically, so the lobby always has all 5 tiers active.
+- **Lobby visibility.** The home page only ever shows `OPEN` games. Once a game is closed/drawn, it disappears from the lobby on its own — no manual cleanup needed. Players can still see the outcome of every game they personally played in their Profile ticket history, drawn or not.
+
+This all lives in `src/lib/rotate.ts` and runs two ways:
+
+1. **Vercel Cron** — `vercel.json` schedules `GET /api/cron/rotate-games` once a day (`0 0 * * *`, UTC). That route requires an `Authorization: Bearer <CRON_SECRET>` header, so set `CRON_SECRET` as an env var in both `.env` and your Vercel project — Vercel automatically sends it as that header on every cron invocation.
+2. **Manual trigger** — the Admin dashboard has a "Run Now" button under Daily Rotation, which calls `POST /api/admin/rotate` (protected by normal admin login, not `CRON_SECRET`). Useful because Vercel's **Hobby plan only guarantees one cron run per day, and it can land anywhere within the scheduled hour** — the manual button is your on-demand override if you don't want to wait.
+
+Admins can still create extra games manually at any of the 5 tiers (or a custom title) from the Create Game form — automation only fills gaps, it never removes that ability.
+
 ## Production notes
 
 - **Payments use Chain2Pay.** Set the env vars below. Slots are reserved as `PENDING` and only marked `COMPLETED` after the gateway confirms (via webhook or the reconciling status poll), so an abandoned checkout auto-releases its slots after `CHAIN2PAY_RESERVATION_MINUTES`.

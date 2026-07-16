@@ -64,9 +64,6 @@ export function GameCard({ game }: GameCardProps) {
           </span>
           {potentialPrize.toLocaleString("en-IN")}
         </p>
-        <p className="text-[11.5px] text-low">
-          {WINNER_PAYOUT_PERCENT}% of pool to the winner · 30% platform fee
-        </p>
       </div>
 
       <div className="relative flex items-center justify-between gap-3 px-4 pt-3">

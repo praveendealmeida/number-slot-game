@@ -11,7 +11,6 @@ import {
   apiFetch,
 } from "@/lib/api-client";
 import { formatRs } from "@/lib/format";
-import { WINNER_PAYOUT_PERCENT } from "@/lib/payout";
 import { formatSlotNumber } from "@/lib/slots";
 
 export default function AdminPage() {
@@ -23,6 +22,7 @@ export default function AdminPage() {
   const [title, setTitle] = useState("");
   const [ticketPrice, setTicketPrice] = useState("100");
   const [drawInputs, setDrawInputs] = useState<Record<string, string>>({});
+  const [rotating, setRotating] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -63,6 +63,30 @@ export default function AdminPage() {
       await loadAdminData();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to create game.");
+    }
+  }
+
+  async function runRotation() {
+    setRotating(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const result = await apiFetch<{
+        autoDrawn: Array<{ gameId: string; winningNumber: number; hasWinner: boolean }>;
+        tiersReplenished: Array<{ ticketPrice: number; title: string }>;
+      }>("/api/admin/rotate", { method: "POST" });
+
+      const drawnCount = result.autoDrawn.length;
+      const createdCount = result.tiersReplenished.length;
+      setMessage(
+        `Rotation complete: ${drawnCount} game(s) auto-drawn, ${createdCount} new game(s) created to refill tiers.`,
+      );
+      await loadAdminData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Rotation failed.");
+    } finally {
+      setRotating(false);
     }
   }
 
@@ -129,6 +153,24 @@ export default function AdminPage() {
         </section>
       ) : null}
 
+      <section className="flex items-center justify-between gap-3 rounded-2xl border border-royal-tint/25 bg-royal/10 p-4">
+        <div>
+          <p className="text-sm font-semibold text-hi">Daily Rotation</p>
+          <p className="text-xs text-mid">
+            Auto-closes games open 24h+, draws them, and refills any empty
+            price tier. Runs once a day on its own — use this to run it now.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={runRotation}
+          disabled={rotating}
+          className="shrink-0 rounded-xl border border-royal-tint/40 px-3 py-2 text-xs font-bold text-royal-tint transition hover:bg-royal/20 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {rotating ? "Running..." : "Run Now"}
+        </button>
+      </section>
+
       <section className="rounded-2xl border border-line bg-card p-4">
         <h2 className="mb-3 text-[13px] font-bold uppercase tracking-wide text-mid">
           Create Game
@@ -145,16 +187,15 @@ export default function AdminPage() {
             onChange={(event) => setTicketPrice(event.target.value)}
             className="w-full rounded-xl border border-line bg-base px-3 py-2 text-sm text-hi placeholder:text-low focus:border-royal focus:outline-none"
           >
-            {["100", "200", "500", "1000"].map((price) => (
+            {["50", "100", "200", "500", "1000"].map((price) => (
               <option key={price} value={price}>
                 Rs. {price}
               </option>
             ))}
           </select>
           <p className="rounded-lg border border-gold/25 bg-gold/10 px-3 py-2 text-xs text-gold-soft">
-            Winner payout is fixed at {WINNER_PAYOUT_PERCENT}% of the pool
-            (platform keeps {100 - WINNER_PAYOUT_PERCENT}%) — not
-            configurable per game.
+            Payout is calculated automatically per fixed platform policy —
+            not configurable per game.
           </p>
           <button
             type="submit"

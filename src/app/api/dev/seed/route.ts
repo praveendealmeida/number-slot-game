@@ -14,7 +14,9 @@ export async function POST() {
 
   await prisma.game.createMany({
     data: [
+      { title: "Rs. 50 Game", ticketPrice: 50, payoutPercent: WINNER_PAYOUT_PERCENT },
       { title: "Rs. 100 Game", ticketPrice: 100, payoutPercent: WINNER_PAYOUT_PERCENT },
+      { title: "Rs. 200 Game", ticketPrice: 200, payoutPercent: WINNER_PAYOUT_PERCENT },
       { title: "Rs. 500 Game", ticketPrice: 500, payoutPercent: WINNER_PAYOUT_PERCENT },
       { title: "Rs. 1000 Game", ticketPrice: 1000, payoutPercent: WINNER_PAYOUT_PERCENT },
     ],
