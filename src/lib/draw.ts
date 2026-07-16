@@ -1,4 +1,5 @@
 import { PrismaClient } from "@/generated/prisma/client";
+import { WINNER_PAYOUT_PERCENT } from "@/lib/payout";
 import { parseSlotNumber } from "@/lib/slots";
 
 type TransactionClient = Omit<
@@ -36,7 +37,7 @@ export async function executeGameDraw(
 
   const game = await tx.game.findUniqueOrThrow({
     where: { id: gameId },
-    select: { id: true, status: true, winningNumber: true, payoutPercent: true },
+    select: { id: true, status: true, winningNumber: true },
   });
 
   if (game.status === "DRAWN") {
@@ -54,10 +55,10 @@ export async function executeGameDraw(
 
   const totalCollections = tickets.reduce((sum, ticket) => sum + ticket.pricePaid, 0);
   const winningTicket = tickets.find((ticket) => ticket.slotNumber === winningNumber);
-  // Winner receives the configured percentage of the pool; the platform keeps
-  // the remainder (and the whole pool when nobody holds the winning number).
+  // Fixed platform policy: winner gets WINNER_PAYOUT_PERCENT of the pool, the
+  // platform keeps the rest (and the whole pool when nobody holds the winning number).
   const payoutAmount = winningTicket
-    ? Math.floor((totalCollections * game.payoutPercent) / 100)
+    ? Math.floor((totalCollections * WINNER_PAYOUT_PERCENT) / 100)
     : 0;
   const platformRevenue = totalCollections - payoutAmount;
 

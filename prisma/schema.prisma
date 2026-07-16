@@ -105,7 +105,9 @@ model Game {
   ticketPrice   Int        @map("ticket_price")
   // Percentage of the collected pool paid to the holder of the winning number.
   // The platform keeps the remainder. Default 80% => 20% house margin.
-  payoutPercent Int        @default(80) @map("payout_percent")
+  // Fixed platform policy: winner always receives 70% of the pool, platform
+  // keeps a flat 30%. Not configurable per-game — see src/lib/payout.ts.
+  payoutPercent Int        @default(70) @map("payout_percent")
   status        GameStatus @default(OPEN)
   winningNumber Int?       @map("winning_number")
   payoutAmount  Int?       @map("payout_amount")

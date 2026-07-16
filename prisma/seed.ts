@@ -2,6 +2,8 @@ import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client.js";
 
+const WINNER_PAYOUT_PERCENT = 70;
+
 const connectionString = process.env.DATABASE_URL;
 if (!connectionString) {
   throw new Error("DATABASE_URL is not set. Add it to your .env before seeding.");
@@ -17,9 +19,9 @@ async function main() {
 
   await prisma.game.createMany({
     data: [
-      { title: "Rs. 100 Game", ticketPrice: 100, payoutPercent: 80 },
-      { title: "Rs. 500 Game", ticketPrice: 500, payoutPercent: 80 },
-      { title: "Rs. 1000 Game", ticketPrice: 1000, payoutPercent: 85 },
+      { title: "Rs. 100 Game", ticketPrice: 100, payoutPercent: WINNER_PAYOUT_PERCENT },
+      { title: "Rs. 500 Game", ticketPrice: 500, payoutPercent: WINNER_PAYOUT_PERCENT },
+      { title: "Rs. 1000 Game", ticketPrice: 1000, payoutPercent: WINNER_PAYOUT_PERCENT },
     ],
   });
 

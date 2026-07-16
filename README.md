@@ -16,7 +16,7 @@ Each game session has 100 slots (numbers `00`–`99`). Players sign in with Goog
 
 ## Payout model
 
-Each game has a `payoutPercent` (default **80**). When the drawn number has a holder, that winner receives `floor(pool × payoutPercent / 100)` and the platform keeps the rest. When the drawn number is unsold, there is no winner and **the whole pool stays with the platform** (no refunds). Admins set the percentage per game on creation.
+The split is a fixed platform policy, not configurable per game: the winner always receives **70%** of the pool (`WINNER_PAYOUT_PERCENT` in `src/lib/payout.ts`), and the platform keeps a flat **30%**. When the drawn number has a holder, they receive `floor(pool × 70 / 100)`. When the drawn number is unsold, there is no winner and **the whole pool stays with the platform** (no refunds). This is enforced server-side in `src/lib/draw.ts` and `src/app/api/games/route.ts` — there is no admin control to change it, by design.
 
 ## Getting started
 

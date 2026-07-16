@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/db";
+import { WINNER_PAYOUT_PERCENT } from "@/lib/payout";
 import { NextResponse } from "next/server";
 
 // Dev-only helper to spin up sample games quickly. Users now come from Google
@@ -13,9 +14,9 @@ export async function POST() {
 
   await prisma.game.createMany({
     data: [
-      { title: "Rs. 100 Game", ticketPrice: 100, payoutPercent: 80 },
-      { title: "Rs. 500 Game", ticketPrice: 500, payoutPercent: 80 },
-      { title: "Rs. 1000 Game", ticketPrice: 1000, payoutPercent: 85 },
+      { title: "Rs. 100 Game", ticketPrice: 100, payoutPercent: WINNER_PAYOUT_PERCENT },
+      { title: "Rs. 500 Game", ticketPrice: 500, payoutPercent: WINNER_PAYOUT_PERCENT },
+      { title: "Rs. 1000 Game", ticketPrice: 1000, payoutPercent: WINNER_PAYOUT_PERCENT },
     ],
   });
 

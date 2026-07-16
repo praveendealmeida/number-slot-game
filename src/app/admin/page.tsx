@@ -11,6 +11,7 @@ import {
   apiFetch,
 } from "@/lib/api-client";
 import { formatRs } from "@/lib/format";
+import { WINNER_PAYOUT_PERCENT } from "@/lib/payout";
 import { formatSlotNumber } from "@/lib/slots";
 
 export default function AdminPage() {
@@ -21,7 +22,6 @@ export default function AdminPage() {
   const [finance, setFinance] = useState<FinanceOverview | null>(null);
   const [title, setTitle] = useState("");
   const [ticketPrice, setTicketPrice] = useState("100");
-  const [payoutPercent, setPayoutPercent] = useState("80");
   const [drawInputs, setDrawInputs] = useState<Record<string, string>>({});
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +56,6 @@ export default function AdminPage() {
         body: JSON.stringify({
           title: title.trim() || undefined,
           ticketPrice: Number(ticketPrice),
-          payoutPercent: Number(payoutPercent),
         }),
       });
       setTitle("");
@@ -152,20 +151,11 @@ export default function AdminPage() {
               </option>
             ))}
           </select>
-          <label className="block">
-            <span className="mb-1 block text-xs text-zinc-500">
-              Winner payout: {payoutPercent}% of the pool (house keeps{" "}
-              {100 - Number(payoutPercent || 0)}%)
-            </span>
-            <input
-              type="range"
-              min={1}
-              max={100}
-              value={payoutPercent}
-              onChange={(event) => setPayoutPercent(event.target.value)}
-              className="w-full"
-            />
-          </label>
+          <p className="rounded-lg bg-zinc-50 px-3 py-2 text-xs text-zinc-500">
+            Winner payout is fixed at {WINNER_PAYOUT_PERCENT}% of the pool
+            (platform keeps {100 - WINNER_PAYOUT_PERCENT}%) — not
+            configurable per game.
+          </p>
           <button
             type="submit"
             className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white"

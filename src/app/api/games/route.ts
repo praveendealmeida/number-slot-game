@@ -1,5 +1,6 @@
 import { requireAdmin } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import { WINNER_PAYOUT_PERCENT } from "@/lib/payout";
 import { TOTAL_SLOTS } from "@/lib/slots";
 import { NextResponse } from "next/server";
 
@@ -48,7 +49,6 @@ export async function GET() {
 type CreateGameBody = {
   title?: string;
   ticketPrice?: number;
-  payoutPercent?: number;
 };
 
 export async function POST(request: Request) {
@@ -69,19 +69,12 @@ export async function POST(request: Request) {
     return jsonError("ticketPrice must be a positive integer.", 400);
   }
 
-  const payoutPercent = body.payoutPercent ?? 80;
-  if (
-    !Number.isInteger(payoutPercent) ||
-    payoutPercent < 1 ||
-    payoutPercent > 100
-  ) {
-    return jsonError("payoutPercent must be an integer between 1 and 100.", 400);
-  }
-
   const title = body.title?.trim() || `Rs. ${ticketPrice} Game`;
 
+  // payoutPercent is a fixed platform policy (WINNER_PAYOUT_PERCENT), not
+  // admin-configurable — any client-supplied value is ignored.
   const game = await prisma.game.create({
-    data: { title, ticketPrice, payoutPercent },
+    data: { title, ticketPrice, payoutPercent: WINNER_PAYOUT_PERCENT },
     select: {
       id: true,
       title: true,
