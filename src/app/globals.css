@@ -1,23 +1,76 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafafa;
-  --foreground: #18181b;
+  --background: #09090b;
+  --foreground: #fafafa;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter), var(--font-noto-sinhala), sans-serif;
+
+  /* Lottery design system */
+  --color-base: #09090b;
+  --color-card: #18181b;
+  --color-card-soft: #1c1c21;
+  --color-line: #27272a;
+  --color-royal: #5b21b6;
+  --color-royal-soft: #4c1d95;
+  --color-royal-deep: #2e1065;
+  --color-royal-tint: #c4b5fd;
+  --color-gold: #facc15;
+  --color-gold-soft: #fde68a;
+  --color-orange: #f97316;
+  --color-green: #22c55e;
+  --color-hi: #fafafa;
+  --color-mid: #a1a1aa;
+  --color-low: #71717a;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background-image: radial-gradient(
+    ellipse 900px 500px at 50% -10%,
+    rgba(91, 33, 182, 0.28),
+    transparent 60%
+  );
 }
 
 * {
   -webkit-tap-highlight-color: transparent;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+.live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--color-green);
+  animation: livepulse 1.6s infinite;
+}
+
+@keyframes livepulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(34, 197, 94, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(34, 197, 94, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .live-dot {
+    animation: none;
+  }
 }

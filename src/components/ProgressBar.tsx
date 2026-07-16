@@ -11,14 +11,16 @@ export function ProgressBar({ soldCount, remainingSlots }: ProgressBarProps) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm">
-        <span className="font-semibold text-zinc-900">
+        <span className="num font-semibold text-hi">
           {soldCount} / {TOTAL_SLOTS} Slots Sold
         </span>
-        <span className="text-amber-700">{remainingSlots} Remaining</span>
+        <span className="num font-semibold text-orange">
+          {remainingSlots} Remaining
+        </span>
       </div>
-      <div className="h-3 overflow-hidden rounded-full bg-zinc-200">
+      <div className="h-2.5 overflow-hidden rounded-full bg-line">
         <div
-          className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-emerald-600 transition-all duration-500"
+          className="h-full rounded-full bg-gradient-to-r from-royal to-royal-tint transition-all duration-500"
           style={{ width: `${percent}%` }}
         />
       </div>

@@ -108,7 +108,7 @@ export default function AdminPage() {
   if (!user || user.role !== "ADMIN") {
     return (
       <AppShell title="Admin" subtitle="Admin access required.">
-        <p className="rounded-2xl bg-white p-4 text-sm text-zinc-500">
+        <p className="rounded-2xl border border-line bg-card p-4 text-sm text-mid">
           Switch to the Platform Admin demo user to access this dashboard.
         </p>
       </AppShell>
@@ -129,8 +129,8 @@ export default function AdminPage() {
         </section>
       ) : null}
 
-      <section className="rounded-2xl border border-zinc-200 bg-white p-4">
-        <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-zinc-500">
+      <section className="rounded-2xl border border-line bg-card p-4">
+        <h2 className="mb-3 text-[13px] font-bold uppercase tracking-wide text-mid">
           Create Game
         </h2>
         <form onSubmit={createGame} className="space-y-3">
@@ -138,12 +138,12 @@ export default function AdminPage() {
             value={title}
             onChange={(event) => setTitle(event.target.value)}
             placeholder="Game title (optional)"
-            className="w-full rounded-xl border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-line bg-base px-3 py-2 text-sm text-hi placeholder:text-low focus:border-royal focus:outline-none"
           />
           <select
             value={ticketPrice}
             onChange={(event) => setTicketPrice(event.target.value)}
-            className="w-full rounded-xl border border-zinc-300 px-3 py-2 text-sm"
+            className="w-full rounded-xl border border-line bg-base px-3 py-2 text-sm text-hi placeholder:text-low focus:border-royal focus:outline-none"
           >
             {["100", "200", "500", "1000"].map((price) => (
               <option key={price} value={price}>
@@ -151,14 +151,14 @@ export default function AdminPage() {
               </option>
             ))}
           </select>
-          <p className="rounded-lg bg-zinc-50 px-3 py-2 text-xs text-zinc-500">
+          <p className="rounded-lg border border-gold/25 bg-gold/10 px-3 py-2 text-xs text-gold-soft">
             Winner payout is fixed at {WINNER_PAYOUT_PERCENT}% of the pool
             (platform keeps {100 - WINNER_PAYOUT_PERCENT}%) — not
             configurable per game.
           </p>
           <button
             type="submit"
-            className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white"
+            className="w-full rounded-xl bg-gradient-to-b from-orange to-gold px-4 py-3 text-sm font-extrabold text-[#1C1006] shadow-[0_8px_24px_rgba(249,115,22,0.25)] transition hover:scale-[1.02]"
           >
             Create Game Session
           </button>
@@ -166,7 +166,7 @@ export default function AdminPage() {
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+        <h2 className="text-[13px] font-bold uppercase tracking-wide text-mid">
           Close & Draw
         </h2>
         {games
@@ -174,16 +174,16 @@ export default function AdminPage() {
           .map((game) => (
             <article
               key={`close-${game.id}`}
-              className="rounded-2xl border border-zinc-200 bg-white p-4"
+              className="rounded-2xl border border-line bg-card p-4"
             >
-              <p className="font-semibold text-zinc-900">{game.title}</p>
-              <p className="text-sm text-zinc-500">
+              <p className="font-semibold text-hi">{game.title}</p>
+              <p className="text-sm text-mid">
                 {game.soldCount} slots sold — close to enable draw
               </p>
               <button
                 type="button"
                 onClick={() => closeGame(game.id)}
-                className="mt-3 w-full rounded-xl border border-zinc-300 px-4 py-2 text-sm font-semibold"
+                className="mt-3 w-full rounded-xl border border-line px-4 py-2 text-sm font-semibold text-mid transition hover:border-royal hover:text-hi"
               >
                 Close Game
               </button>
@@ -194,10 +194,10 @@ export default function AdminPage() {
           .map((game) => (
             <article
               key={game.id}
-              className="rounded-2xl border border-zinc-200 bg-white p-4"
+              className="rounded-2xl border border-line bg-card p-4"
             >
-              <p className="font-semibold text-zinc-900">{game.title}</p>
-              <p className="text-sm text-zinc-500">
+              <p className="font-semibold text-hi">{game.title}</p>
+              <p className="text-sm text-mid">
                 {game.soldCount} slots sold — ready to draw
               </p>
               <div className="mt-3 flex gap-2">
@@ -213,12 +213,12 @@ export default function AdminPage() {
                     }))
                   }
                   placeholder="00-99"
-                  className="w-24 rounded-xl border border-zinc-300 px-3 py-2 text-sm"
+                  className="num w-24 rounded-xl border border-line bg-base px-3 py-2 text-sm text-hi placeholder:text-low focus:border-royal focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => runDraw(game.id)}
-                  className="flex-1 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white"
+                  className="flex-1 rounded-xl bg-gradient-to-b from-orange to-gold px-4 py-2 text-sm font-extrabold text-[#1C1006] transition hover:scale-[1.02]"
                 >
                   Enter Winning Number
                 </button>
@@ -226,7 +226,7 @@ export default function AdminPage() {
             </article>
           ))}
         {games.filter((game) => game.status === "CLOSED").length === 0 ? (
-          <p className="rounded-2xl bg-white p-4 text-sm text-zinc-500">
+          <p className="rounded-2xl border border-line bg-card p-4 text-sm text-mid">
             No closed games awaiting draw. Games auto-close when all 100 slots sell.
           </p>
         ) : null}
@@ -234,24 +234,24 @@ export default function AdminPage() {
 
       {finance ? (
         <section className="space-y-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-500">
+          <h2 className="text-[13px] font-bold uppercase tracking-wide text-mid">
             Financial Overview
           </h2>
           {finance.games.map((game) => (
             <article
               key={game.gameId}
-              className="rounded-2xl border border-zinc-200 bg-white p-4 text-sm"
+              className="rounded-2xl border border-line bg-card p-4 text-sm"
             >
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="font-semibold text-zinc-900">{game.title}</p>
-                  <p className="text-zinc-500">{game.status}</p>
+                  <p className="font-semibold text-hi">{game.title}</p>
+                  <p className="text-mid">{game.status}</p>
                 </div>
-                <p className="font-semibold text-emerald-700">
+                <p className="num font-bold text-green">
                   Net {formatRs(game.platformRevenue)}
                 </p>
               </div>
-              <div className="mt-2 grid grid-cols-2 gap-2 text-zinc-600">
+              <div className="num mt-2 grid grid-cols-2 gap-2 text-mid">
                 <span>Collected: {formatRs(game.totalCollections)}</span>
                 <span>
                   Payout: {formatRs(game.payoutAmount)} ({game.payoutPercent}%)
@@ -270,12 +270,12 @@ export default function AdminPage() {
       ) : null}
 
       {message ? (
-        <p className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+        <p className="rounded-2xl border border-green/30 bg-green/10 p-4 text-sm text-green">
           {message}
         </p>
       ) : null}
       {error ? (
-        <p className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+        <p className="rounded-2xl border border-orange/30 bg-orange/10 p-4 text-sm text-orange">
           {error}
         </p>
       ) : null}
@@ -285,9 +285,9 @@ export default function AdminPage() {
 
 function Metric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-4">
-      <p className="text-xs uppercase tracking-wide text-zinc-500">{label}</p>
-      <p className="mt-1 text-base font-bold text-zinc-900">{value}</p>
+    <div className="rounded-2xl border border-line bg-card p-4">
+      <p className="text-[10.5px] font-semibold uppercase tracking-wide text-low">{label}</p>
+      <p className="num mt-1 text-base font-black text-gold">{value}</p>
     </div>
   );
 }

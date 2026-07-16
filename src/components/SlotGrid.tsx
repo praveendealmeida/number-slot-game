@@ -36,18 +36,18 @@ export function SlotGrid({
         const isMine = isSold && currentUserId && soldSlotOwners[slotNumber] === currentUserId;
 
         let className =
-          "aspect-square rounded-lg text-xs font-semibold transition sm:text-sm ";
+          "num aspect-square rounded-lg text-xs font-bold transition sm:text-sm ";
 
         if (isSold) {
           className += isMine
-            ? "cursor-not-allowed bg-blue-100 text-blue-800"
-            : "cursor-not-allowed bg-zinc-200 text-zinc-500";
+            ? "cursor-not-allowed border border-royal-tint/60 bg-royal/25 text-royal-tint"
+            : "cursor-not-allowed bg-line/70 text-low";
         } else if (isSelected) {
-          className += "bg-emerald-600 text-white shadow-md";
+          className += "bg-gradient-to-b from-orange to-gold text-[#1C1006] shadow-[0_0_0_1px_rgba(250,204,21,0.4),0_4px_14px_rgba(250,204,21,0.3)]";
         } else if (disabled) {
-          className += "cursor-not-allowed bg-zinc-100 text-zinc-400";
+          className += "cursor-not-allowed bg-card text-low ring-1 ring-line/60";
         } else {
-          className += "bg-white text-zinc-800 ring-1 ring-zinc-200 hover:bg-emerald-50";
+          className += "bg-card text-hi ring-1 ring-line hover:ring-gold/60 hover:bg-card-soft";
         }
 
         return (
