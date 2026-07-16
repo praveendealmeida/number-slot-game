@@ -1,12 +1,17 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { ProgressBar } from "@/components/ProgressBar";
 import { SlotGrid } from "@/components/SlotGrid";
 import { useUser } from "@/context/UserContext";
-import { GameBoardResponse, apiFetch } from "@/lib/api-client";
+import {
+  GameBoardResponse,
+  PaymentStatusResponse,
+  PurchaseInitResponse,
+  apiFetch,
+} from "@/lib/api-client";
 import { formatRs } from "@/lib/format";
 import { formatSlotNumber } from "@/lib/slots";
 
@@ -20,6 +25,9 @@ export default function GamePage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  // Order id we're waiting on while the buyer completes hosted checkout.
+  const [awaitingRef, setAwaitingRef] = useState<string | null>(null);
+  const pollDeadline = useRef<number>(0);
 
   const loadBoard = useCallback(async () => {
     const data = await apiFetch<GameBoardResponse>(`/api/games/${gameId}/tickets`);
@@ -33,6 +41,45 @@ export default function GamePage() {
     }, 4000);
     return () => clearInterval(interval);
   }, [loadBoard]);
+
+  // Poll for payment confirmation while awaiting checkout.
+  useEffect(() => {
+    if (!awaitingRef) {
+      return;
+    }
+    pollDeadline.current = Date.now() + 10 * 60 * 1000; // give up after 10 min
+
+    const poll = async () => {
+      if (Date.now() > pollDeadline.current) {
+        setAwaitingRef(null);
+        setMessage(null);
+        setError("Still waiting on payment. Refresh this page once you've paid.");
+        return;
+      }
+      try {
+        const res = await apiFetch<PaymentStatusResponse>(
+          `/api/payments/status?ref=${encodeURIComponent(awaitingRef)}`,
+        );
+        if (res.status === "paid") {
+          setAwaitingRef(null);
+          setMessage("Payment confirmed — your slots are locked in. Good luck!");
+          setError(null);
+          await loadBoard();
+        } else if (res.status === "expired" || res.status === "not_found") {
+          setAwaitingRef(null);
+          setMessage(null);
+          setError("Payment wasn't completed and the slots were released.");
+          await loadBoard();
+        }
+      } catch {
+        // transient — keep polling until the deadline
+      }
+    };
+
+    poll();
+    const interval = setInterval(poll, 4000);
+    return () => clearInterval(interval);
+  }, [awaitingRef, loadBoard]);
 
   const soldSlots = board?.soldSlots.map((slot) => slot.slotNumber) ?? [];
   const soldSlotOwners = useMemo(() => {
@@ -50,6 +97,7 @@ export default function GamePage() {
 
   const totalCost = board ? selected.length * board.game.ticketPrice : 0;
   const isOpen = board?.game.status === "OPEN";
+  const busy = submitting || awaitingRef !== null;
 
   function toggleSlot(slotNumber: number) {
     setSelected((current) =>
@@ -63,29 +111,34 @@ export default function GamePage() {
     if (!selected.length) {
       return;
     }
+    if (!user) {
+      setError("Please sign in before buying slots.");
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
     setMessage(null);
 
     try {
-      const result = await apiFetch<{
-        soldCount: number;
-        remainingSlots: number;
-        totalPaid: number;
-        tickets: Array<{ slotNumber: number }>;
-      }>(`/api/games/${gameId}/tickets`, {
-        method: "POST",
-        body: JSON.stringify({ slotNumbers: selected }),
-      });
-
-      setMessage(
-        `Purchased ${result.tickets.map((ticket) => formatSlotNumber(ticket.slotNumber)).join(", ")} for ${formatRs(result.totalPaid)}.`,
+      const result = await apiFetch<PurchaseInitResponse>(
+        `/api/games/${gameId}/tickets`,
+        {
+          method: "POST",
+          body: JSON.stringify({ slotNumbers: selected }),
+        },
       );
+
+      // Open the hosted checkout in a new tab; this page polls for confirmation.
+      window.open(result.checkoutUrl, "_blank", "noopener,noreferrer");
+      setAwaitingRef(result.orderId);
       setSelected([]);
+      setMessage(
+        `Complete the ${result.currency} ${result.amount.toFixed(2)} payment in the new tab. This page updates automatically once it's confirmed.`,
+      );
       await loadBoard();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Purchase failed.");
+      setError(err instanceof Error ? err.message : "Could not start checkout.");
     } finally {
       setSubmitting(false);
     }
@@ -126,7 +179,7 @@ export default function GamePage() {
               soldSlots={soldSlots}
               selected={selected}
               ownedByUser={ownedByUser}
-              disabled={!isOpen || submitting}
+              disabled={!isOpen || busy}
               currentUserId={user?.id ?? null}
               soldSlotOwners={soldSlotOwners}
               onToggle={toggleSlot}
@@ -136,13 +189,15 @@ export default function GamePage() {
           {isOpen ? (
             <button
               type="button"
-              disabled={!selected.length || submitting}
+              disabled={!selected.length || busy}
               onClick={purchaseSelected}
               className="w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-zinc-300"
             >
-              {submitting
-                ? "Processing..."
-                : `Buy ${selected.length || 0} Slot(s) — ${formatRs(totalCost)}`}
+              {awaitingRef
+                ? "Waiting for payment..."
+                : submitting
+                  ? "Starting checkout..."
+                  : `Buy ${selected.length || 0} Slot(s) — ${formatRs(totalCost)}`}
             </button>
           ) : null}
 

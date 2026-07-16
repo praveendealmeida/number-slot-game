@@ -12,7 +12,7 @@ Each game session has 100 slots (numbers `00`–`99`). Players sign in with Goog
 | DB / ORM  | PostgreSQL via Prisma 7 `prisma-client` generator + `@prisma/adapter-pg` |
 | Auth      | Google OAuth via Auth.js v5 (`next-auth`) with the Prisma adapter      |
 | UI        | Tailwind CSS v4, Geist font                                           |
-| Payments  | Placeholder — `src/lib/payment.ts` always succeeds (swap in a real gateway) |
+| Payments  | Chain2Pay hosted card-to-crypto checkout (`src/lib/payment.ts`) with reserve → checkout → webhook/poll settlement |
 
 ## Payout model
 
@@ -93,9 +93,38 @@ types/next-auth.d.ts   # session/user type augmentation (adds id + role)
 
 `src/auth.ts` wires the Google provider to the Prisma adapter with **database sessions**. On sign-in the adapter creates `User`/`Account`/`Session` rows; the `session` callback exposes `user.id` and `user.role` to the app. API guards (`src/lib/auth.ts`) call `auth()` and check the role server-side, so the admin endpoints are protected regardless of the client UI. New users default to `USER`; the `events.createUser` hook promotes the `ADMIN_EMAIL` account on its first sign-in.
 
+## Payments (Chain2Pay)
+
+Buying slots is a hosted-checkout flow (Chain2Pay, https://docs.chain2pay.is):
+
+1. The buyer selects slots and hits Buy. The server reserves those slots as `PENDING` tickets (held for `CHAIN2PAY_RESERVATION_MINUTES`), creates a Chain2Pay payment, and returns a `checkout_url`.
+2. The buyer completes payment on Chain2Pay's hosted page (card/Apple Pay/etc → USDC).
+3. Chain2Pay calls the webhook at `/api/payments/chain2pay`, and the game page also polls `/api/payments/status`. Either path re-fetches the authoritative payment status from the gateway and, when `paid`, flips the reserved tickets to `COMPLETED`. Expired payments release the slots.
+
+The gateway status is always treated as the source of truth — the webhook payload alone is never trusted.
+
+### Required env
+
+| Var | Purpose |
+| --- | --- |
+| `CHAIN2PAY_API_KEY` | `c2p_sandbox_...` for testing, `c2p_live_...` in production |
+| `CHAIN2PAY_WEBHOOK_SECRET` | Optional; set in dashboard → Webhooks to verify HMAC signatures |
+| `CHAIN2PAY_CURRENCY` | Settlement currency: `USD`, `EUR`, `GBP`, or `CAD` (no LKR) |
+| `CHAIN2PAY_FIAT_PER_LKR` | Rate to convert LKR ticket prices to the charge currency (~`0.0033` = USD) |
+| `CHAIN2PAY_MIN_AMOUNT` | Per-payment floor the providers enforce (~`6` USD for multihosted) |
+| `CHAIN2PAY_RESERVATION_MINUTES` | How long a slot stays reserved during checkout |
+| `APP_URL` | Public base URL used to build the webhook callback (your Vercel domain in prod) |
+
+### Important constraint
+
+Chain2Pay settles only in USD/EUR/GBP/CAD and has a **per-payment minimum of roughly $3–6**. Rs. 100–1000 tickets convert to well under that, so a single-slot purchase is rejected with a clear minimum message — buyers must select enough slots to clear the floor, or you raise ticket prices.
+
+### Sandbox testing
+
+Use a `c2p_sandbox_*` key. Create a purchase, then confirm it from the Chain2Pay dashboard (Transactions → the order → "Send Test Callback") or via `POST /api/v2/payments/:id/sandbox-confirm`. The status poll will pick up the `paid` state and lock in the slots. Because the webhook needs a public URL, on `localhost` rely on the dashboard confirm + the polling reconciliation (no public webhook required).
+
 ## Production notes
 
-- **Payments are still a placeholder.** `src/lib/payment.ts` always returns success. Wire in a real provider and only mark tickets `COMPLETED` after the provider confirms.
+- **Payments use Chain2Pay.** Set the env vars below. Slots are reserved as `PENDING` and only marked `COMPLETED` after the gateway confirms (via webhook or the reconciling status poll), so an abandoned checkout auto-releases its slots after `CHAIN2PAY_RESERVATION_MINUTES`.
 - **On Vercel:** set all `.env` values as project env vars, use a *pooled* `DATABASE_URL` for the app runtime, and run `prisma db push`/`migrate` against the *direct* (non-pooled) connection. Set `AUTH_URL` to your production URL if Auth.js doesn't infer it.
 - A paid 100-slot number-draw game is a regulated activity in many jurisdictions — make sure the operating model is licensed/compliant before taking real money.
-"# number-slot-game" 
