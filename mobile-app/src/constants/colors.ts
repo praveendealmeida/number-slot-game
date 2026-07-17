@@ -1,0 +1,17 @@
+export const colors = {
+  base: "#09090B",
+  card: "#18181B",
+  cardSoft: "#1C1C21",
+  line: "#27272A",
+  royal: "#5B21B6",
+  royalSoft: "#4C1D95",
+  royalDeep: "#2E1065",
+  royalTint: "#C4B5FD",
+  gold: "#FACC15",
+  goldSoft: "#FDE68A",
+  orange: "#F97316",
+  green: "#22C55E",
+  hi: "#FAFAFA",
+  mid: "#A1A1AA",
+  low: "#71717A",
+} as const;
