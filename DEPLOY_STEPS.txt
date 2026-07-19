@@ -1,0 +1,17 @@
+=== CORRECT BUILD STEPS ===
+
+1. Cancel the wrong build:
+   Press Ctrl + C in the terminal
+
+2. Navigate to mobile-app and build:
+   cd mobile-app
+   npx eas-cli build --platform android --profile preview
+
+3. When prompted about EAS project:
+   - Say NO to creating a new project
+   - Choose to link existing project "lucky-lanka"
+   - This keeps bundle ID: com.luckylanka.app
+
+4. Wait for the build URL to appear, then open it in browser to watch progress
+
+5. After ~10-20 min, download the APK from the build page

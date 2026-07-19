@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "9549cabb-eac3-444d-a594-e0a585025c9a"
+      }
+    },
+    "android": {
+      "package": "com.praveendealmeida.numberslotgame"
+    }
+  }
+}
