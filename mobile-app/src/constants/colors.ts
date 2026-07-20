@@ -1,17 +1,33 @@
 export const colors = {
-  base: "#09090B",
-  card: "#18181B",
-  cardSoft: "#1C1C21",
-  line: "#27272A",
-  royal: "#5B21B6",
-  royalSoft: "#4C1D95",
-  royalDeep: "#2E1065",
-  royalTint: "#C4B5FD",
-  gold: "#FACC15",
+  // Backgrounds
+  base: "#0B0F14",
+  surface: "#151B24",
+  card: "#1A202C",
+  elevated: "#1E2530",
+
+  // Accents
+  royal: "#8338EC",
+  royalSoft: "#9B5DE5",
+  royalDeep: "#6A2DC8",
+
+  // CTA
+  orange: "#FB5607",
+  orangeSoft: "#FF7B3D",
+
+  // Gold
+  gold: "#F5C542",
   goldSoft: "#FDE68A",
-  orange: "#F97316",
+
+  // Text
+  hi: "#F8F9FA",
+  mid: "#A0A4B8",
+  low: "#6B7280",
+
+  // Semantic
   green: "#22C55E",
-  hi: "#FAFAFA",
-  mid: "#A1A1AA",
-  low: "#71717A",
+  red: "#EF4444",
+
+  // Borders
+  line: "#1E293B",
+  lineLight: "#334155",
 } as const;

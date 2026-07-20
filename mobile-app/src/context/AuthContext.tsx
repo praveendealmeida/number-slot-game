@@ -1,10 +1,17 @@
 import { createContext, useContext, useEffect, useState, useCallback, ReactNode } from "react";
-import { AppUser, fetchCurrentUser, clearStoredToken, getStoredToken } from "@/lib/api-client";
+import {
+  AppUser,
+  fetchCurrentUser,
+  signOutUser,
+  verifyOTP as apiVerifyOTP,
+  getStoredToken,
+} from "@/lib/api-client";
 
 type AuthContextValue = {
   user: AppUser | null;
   loading: boolean;
   isAuthenticated: boolean;
+  loginWithPhone: (phone: string, otp: string) => Promise<AppUser>;
   refreshUser: () => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -13,6 +20,7 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   loading: true,
   isAuthenticated: false,
+  loginWithPhone: async () => { throw new Error("Not implemented"); },
   refreshUser: async () => {},
   signOut: async () => {},
 });
@@ -38,12 +46,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  // Restore session on mount
   useEffect(() => {
     refreshUser();
   }, [refreshUser]);
 
+  const loginWithPhone = useCallback(async (phone: string, otp: string): Promise<AppUser> => {
+    const res = await apiVerifyOTP(phone, otp);
+    setUser(res.user);
+    return res.user;
+  }, []);
+
   const signOut = useCallback(async () => {
-    await clearStoredToken();
+    await signOutUser();
     setUser(null);
   }, []);
 
@@ -53,6 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         loading,
         isAuthenticated: !!user,
+        loginWithPhone,
         refreshUser,
         signOut,
       }}

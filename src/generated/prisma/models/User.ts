@@ -20,8 +20,20 @@ export type UserModel = runtime.Types.Result.DefaultSelection<Prisma.$UserPayloa
 
 export type AggregateUser = {
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
+}
+
+export type UserAvgAggregateOutputType = {
+  mobileTokenVersion: number | null
+  kycLevel: number | null
+}
+
+export type UserSumAggregateOutputType = {
+  mobileTokenVersion: number | null
+  kycLevel: number | null
 }
 
 export type UserMinAggregateOutputType = {
@@ -31,8 +43,13 @@ export type UserMinAggregateOutputType = {
   emailVerified: Date | null
   image: string | null
   role: $Enums.UserRole | null
+  mobileTokenVersion: number | null
   createdAt: Date | null
   updatedAt: Date | null
+  phoneNumber: string | null
+  phoneVerified: boolean | null
+  kycLevel: number | null
+  kycStatus: string | null
 }
 
 export type UserMaxAggregateOutputType = {
@@ -42,8 +59,13 @@ export type UserMaxAggregateOutputType = {
   emailVerified: Date | null
   image: string | null
   role: $Enums.UserRole | null
+  mobileTokenVersion: number | null
   createdAt: Date | null
   updatedAt: Date | null
+  phoneNumber: string | null
+  phoneVerified: boolean | null
+  kycLevel: number | null
+  kycStatus: string | null
 }
 
 export type UserCountAggregateOutputType = {
@@ -53,11 +75,26 @@ export type UserCountAggregateOutputType = {
   emailVerified: number
   image: number
   role: number
+  mobileTokenVersion: number
   createdAt: number
   updatedAt: number
+  phoneNumber: number
+  phoneVerified: number
+  kycLevel: number
+  kycStatus: number
   _all: number
 }
 
+
+export type UserAvgAggregateInputType = {
+  mobileTokenVersion?: true
+  kycLevel?: true
+}
+
+export type UserSumAggregateInputType = {
+  mobileTokenVersion?: true
+  kycLevel?: true
+}
 
 export type UserMinAggregateInputType = {
   id?: true
@@ -66,8 +103,13 @@ export type UserMinAggregateInputType = {
   emailVerified?: true
   image?: true
   role?: true
+  mobileTokenVersion?: true
   createdAt?: true
   updatedAt?: true
+  phoneNumber?: true
+  phoneVerified?: true
+  kycLevel?: true
+  kycStatus?: true
 }
 
 export type UserMaxAggregateInputType = {
@@ -77,8 +119,13 @@ export type UserMaxAggregateInputType = {
   emailVerified?: true
   image?: true
   role?: true
+  mobileTokenVersion?: true
   createdAt?: true
   updatedAt?: true
+  phoneNumber?: true
+  phoneVerified?: true
+  kycLevel?: true
+  kycStatus?: true
 }
 
 export type UserCountAggregateInputType = {
@@ -88,8 +135,13 @@ export type UserCountAggregateInputType = {
   emailVerified?: true
   image?: true
   role?: true
+  mobileTokenVersion?: true
   createdAt?: true
   updatedAt?: true
+  phoneNumber?: true
+  phoneVerified?: true
+  kycLevel?: true
+  kycStatus?: true
   _all?: true
 }
 
@@ -131,6 +183,18 @@ export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: UserAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: UserSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: UserMinAggregateInputType
@@ -161,6 +225,8 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: UserCountAggregateInputType | true
+  _avg?: UserAvgAggregateInputType
+  _sum?: UserSumAggregateInputType
   _min?: UserMinAggregateInputType
   _max?: UserMaxAggregateInputType
 }
@@ -168,13 +234,20 @@ export type UserGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
 export type UserGroupByOutputType = {
   id: string
   name: string | null
-  email: string
+  email: string | null
   emailVerified: Date | null
   image: string | null
   role: $Enums.UserRole
+  mobileTokenVersion: number
   createdAt: Date
   updatedAt: Date
+  phoneNumber: string | null
+  phoneVerified: boolean
+  kycLevel: number
+  kycStatus: string | null
   _count: UserCountAggregateOutputType | null
+  _avg: UserAvgAggregateOutputType | null
+  _sum: UserSumAggregateOutputType | null
   _min: UserMinAggregateOutputType | null
   _max: UserMaxAggregateOutputType | null
 }
@@ -200,34 +273,55 @@ export type UserWhereInput = {
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   id?: Prisma.StringFilter<"User"> | string
   name?: Prisma.StringNullableFilter<"User"> | string | null
-  email?: Prisma.StringFilter<"User"> | string
+  email?: Prisma.StringNullableFilter<"User"> | string | null
   emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   image?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  phoneNumber?: Prisma.StringNullableFilter<"User"> | string | null
+  phoneVerified?: Prisma.BoolFilter<"User"> | boolean
+  kycLevel?: Prisma.IntFilter<"User"> | number
+  kycStatus?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   tickets?: Prisma.TicketListRelationFilter
+  wallet?: Prisma.XOR<Prisma.WalletNullableScalarRelationFilter, Prisma.WalletWhereInput> | null
+  dailyTickets?: Prisma.DailyTicketListRelationFilter
+  transactions?: Prisma.TransactionListRelationFilter
+  adminActions?: Prisma.AdminActionListRelationFilter
+  adminTargeted?: Prisma.AdminActionListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrderInput | Prisma.SortOrder
-  email?: Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
+  mobileTokenVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneVerified?: Prisma.SortOrder
+  kycLevel?: Prisma.SortOrder
+  kycStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   accounts?: Prisma.AccountOrderByRelationAggregateInput
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   tickets?: Prisma.TicketOrderByRelationAggregateInput
+  wallet?: Prisma.WalletOrderByWithRelationInput
+  dailyTickets?: Prisma.DailyTicketOrderByRelationAggregateInput
+  transactions?: Prisma.TransactionOrderByRelationAggregateInput
+  adminActions?: Prisma.AdminActionOrderByRelationAggregateInput
+  adminTargeted?: Prisma.AdminActionOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   email?: string
+  phoneNumber?: string
   AND?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
   OR?: Prisma.UserWhereInput[]
   NOT?: Prisma.UserWhereInput | Prisma.UserWhereInput[]
@@ -235,25 +329,41 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   emailVerified?: Prisma.DateTimeNullableFilter<"User"> | Date | string | null
   image?: Prisma.StringNullableFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFilter<"User"> | number
   createdAt?: Prisma.DateTimeFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string
+  phoneVerified?: Prisma.BoolFilter<"User"> | boolean
+  kycLevel?: Prisma.IntFilter<"User"> | number
+  kycStatus?: Prisma.StringNullableFilter<"User"> | string | null
   accounts?: Prisma.AccountListRelationFilter
   sessions?: Prisma.SessionListRelationFilter
   tickets?: Prisma.TicketListRelationFilter
-}, "id" | "email">
+  wallet?: Prisma.XOR<Prisma.WalletNullableScalarRelationFilter, Prisma.WalletWhereInput> | null
+  dailyTickets?: Prisma.DailyTicketListRelationFilter
+  transactions?: Prisma.TransactionListRelationFilter
+  adminActions?: Prisma.AdminActionListRelationFilter
+  adminTargeted?: Prisma.AdminActionListRelationFilter
+}, "id" | "email" | "phoneNumber">
 
 export type UserOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   name?: Prisma.SortOrderInput | Prisma.SortOrder
-  email?: Prisma.SortOrder
+  email?: Prisma.SortOrderInput | Prisma.SortOrder
   emailVerified?: Prisma.SortOrderInput | Prisma.SortOrder
   image?: Prisma.SortOrderInput | Prisma.SortOrder
   role?: Prisma.SortOrder
+  mobileTokenVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrderInput | Prisma.SortOrder
+  phoneVerified?: Prisma.SortOrder
+  kycLevel?: Prisma.SortOrder
+  kycStatus?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.UserCountOrderByAggregateInput
+  _avg?: Prisma.UserAvgOrderByAggregateInput
   _max?: Prisma.UserMaxOrderByAggregateInput
   _min?: Prisma.UserMinOrderByAggregateInput
+  _sum?: Prisma.UserSumOrderByAggregateInput
 }
 
 export type UserScalarWhereWithAggregatesInput = {
@@ -262,101 +372,161 @@ export type UserScalarWhereWithAggregatesInput = {
   NOT?: Prisma.UserScalarWhereWithAggregatesInput | Prisma.UserScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"User"> | string
   name?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
-  email?: Prisma.StringWithAggregatesFilter<"User"> | string
+  email?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   emailVerified?: Prisma.DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
   image?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
   role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntWithAggregatesFilter<"User"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string
+  phoneNumber?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
+  phoneVerified?: Prisma.BoolWithAggregatesFilter<"User"> | boolean
+  kycLevel?: Prisma.IntWithAggregatesFilter<"User"> | number
+  kycStatus?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null
 }
 
 export type UserCreateInput = {
   id?: string
   name?: string | null
-  email: string
+  email?: string | null
   emailVerified?: Date | string | null
   image?: string | null
   role?: $Enums.UserRole
+  mobileTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   tickets?: Prisma.TicketCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionCreateNestedManyWithoutTargetInput
 }
 
 export type UserUncheckedCreateInput = {
   id?: string
   name?: string | null
-  email: string
+  email?: string | null
   emailVerified?: Date | string | null
   image?: string | null
   role?: $Enums.UserRole
+  mobileTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   tickets?: Prisma.TicketUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionUncheckedCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionUncheckedCreateNestedManyWithoutTargetInput
 }
 
 export type UserUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   tickets?: Prisma.TicketUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUpdateManyWithoutTargetNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   tickets?: Prisma.TicketUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUncheckedUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUncheckedUpdateManyWithoutTargetNestedInput
 }
 
 export type UserCreateManyInput = {
   id?: string
   name?: string | null
-  email: string
+  email?: string | null
   emailVerified?: Date | string | null
   image?: string | null
   role?: $Enums.UserRole
+  mobileTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
 }
 
 export type UserUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type UserCountOrderByAggregateInput = {
@@ -366,8 +536,18 @@ export type UserCountOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  mobileTokenVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerified?: Prisma.SortOrder
+  kycLevel?: Prisma.SortOrder
+  kycStatus?: Prisma.SortOrder
+}
+
+export type UserAvgOrderByAggregateInput = {
+  mobileTokenVersion?: Prisma.SortOrder
+  kycLevel?: Prisma.SortOrder
 }
 
 export type UserMaxOrderByAggregateInput = {
@@ -377,8 +557,13 @@ export type UserMaxOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  mobileTokenVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerified?: Prisma.SortOrder
+  kycLevel?: Prisma.SortOrder
+  kycStatus?: Prisma.SortOrder
 }
 
 export type UserMinOrderByAggregateInput = {
@@ -388,13 +573,28 @@ export type UserMinOrderByAggregateInput = {
   emailVerified?: Prisma.SortOrder
   image?: Prisma.SortOrder
   role?: Prisma.SortOrder
+  mobileTokenVersion?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  phoneNumber?: Prisma.SortOrder
+  phoneVerified?: Prisma.SortOrder
+  kycLevel?: Prisma.SortOrder
+  kycStatus?: Prisma.SortOrder
+}
+
+export type UserSumOrderByAggregateInput = {
+  mobileTokenVersion?: Prisma.SortOrder
+  kycLevel?: Prisma.SortOrder
 }
 
 export type UserScalarRelationFilter = {
   is?: Prisma.UserWhereInput
   isNot?: Prisma.UserWhereInput
+}
+
+export type UserNullableScalarRelationFilter = {
+  is?: Prisma.UserWhereInput | null
+  isNot?: Prisma.UserWhereInput | null
 }
 
 export type StringFieldUpdateOperationsInput = {
@@ -413,8 +613,20 @@ export type EnumUserRoleFieldUpdateOperationsInput = {
   set?: $Enums.UserRole
 }
 
+export type IntFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type DateTimeFieldUpdateOperationsInput = {
   set?: Date | string
+}
+
+export type BoolFieldUpdateOperationsInput = {
+  set?: boolean
 }
 
 export type UserCreateNestedOneWithoutAccountsInput = {
@@ -459,30 +671,122 @@ export type UserUpdateOneRequiredWithoutTicketsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTicketsInput, Prisma.UserUpdateWithoutTicketsInput>, Prisma.UserUncheckedUpdateWithoutTicketsInput>
 }
 
+export type UserCreateNestedOneWithoutWalletInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWalletInput, Prisma.UserUncheckedCreateWithoutWalletInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWalletInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutWalletNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutWalletInput, Prisma.UserUncheckedCreateWithoutWalletInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutWalletInput
+  upsert?: Prisma.UserUpsertWithoutWalletInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutWalletInput, Prisma.UserUpdateWithoutWalletInput>, Prisma.UserUncheckedUpdateWithoutWalletInput>
+}
+
+export type UserCreateNestedOneWithoutDailyTicketsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDailyTicketsInput, Prisma.UserUncheckedCreateWithoutDailyTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDailyTicketsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutDailyTicketsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutDailyTicketsInput, Prisma.UserUncheckedCreateWithoutDailyTicketsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutDailyTicketsInput
+  upsert?: Prisma.UserUpsertWithoutDailyTicketsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutDailyTicketsInput, Prisma.UserUpdateWithoutDailyTicketsInput>, Prisma.UserUncheckedUpdateWithoutDailyTicketsInput>
+}
+
+export type UserCreateNestedOneWithoutAdminActionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminActionsInput, Prisma.UserUncheckedCreateWithoutAdminActionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminActionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserCreateNestedOneWithoutAdminTargetedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminTargetedInput, Prisma.UserUncheckedCreateWithoutAdminTargetedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminTargetedInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutAdminActionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminActionsInput, Prisma.UserUncheckedCreateWithoutAdminActionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminActionsInput
+  upsert?: Prisma.UserUpsertWithoutAdminActionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdminActionsInput, Prisma.UserUpdateWithoutAdminActionsInput>, Prisma.UserUncheckedUpdateWithoutAdminActionsInput>
+}
+
+export type UserUpdateOneWithoutAdminTargetedNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutAdminTargetedInput, Prisma.UserUncheckedCreateWithoutAdminTargetedInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutAdminTargetedInput
+  upsert?: Prisma.UserUpsertWithoutAdminTargetedInput
+  disconnect?: Prisma.UserWhereInput | boolean
+  delete?: Prisma.UserWhereInput | boolean
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAdminTargetedInput, Prisma.UserUpdateWithoutAdminTargetedInput>, Prisma.UserUncheckedUpdateWithoutAdminTargetedInput>
+}
+
+export type UserCreateNestedOneWithoutTransactionsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTransactionsInput, Prisma.UserUncheckedCreateWithoutTransactionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTransactionsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutTransactionsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTransactionsInput, Prisma.UserUncheckedCreateWithoutTransactionsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTransactionsInput
+  upsert?: Prisma.UserUpsertWithoutTransactionsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTransactionsInput, Prisma.UserUpdateWithoutTransactionsInput>, Prisma.UserUncheckedUpdateWithoutTransactionsInput>
+}
+
 export type UserCreateWithoutAccountsInput = {
   id?: string
   name?: string | null
-  email: string
+  email?: string | null
   emailVerified?: Date | string | null
   image?: string | null
   role?: $Enums.UserRole
+  mobileTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
   tickets?: Prisma.TicketCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionCreateNestedManyWithoutTargetInput
 }
 
 export type UserUncheckedCreateWithoutAccountsInput = {
   id?: string
   name?: string | null
-  email: string
+  email?: string | null
   emailVerified?: Date | string | null
   image?: string | null
   role?: $Enums.UserRole
+  mobileTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
   tickets?: Prisma.TicketUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionUncheckedCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionUncheckedCreateNestedManyWithoutTargetInput
 }
 
 export type UserCreateOrConnectWithoutAccountsInput = {
@@ -504,53 +808,93 @@ export type UserUpdateToOneWithWhereWithoutAccountsInput = {
 export type UserUpdateWithoutAccountsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
   tickets?: Prisma.TicketUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUpdateManyWithoutTargetNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAccountsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
   tickets?: Prisma.TicketUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUncheckedUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUncheckedUpdateManyWithoutTargetNestedInput
 }
 
 export type UserCreateWithoutSessionsInput = {
   id?: string
   name?: string | null
-  email: string
+  email?: string | null
   emailVerified?: Date | string | null
   image?: string | null
   role?: $Enums.UserRole
+  mobileTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   tickets?: Prisma.TicketCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionCreateNestedManyWithoutTargetInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
   id?: string
   name?: string | null
-  email: string
+  email?: string | null
   emailVerified?: Date | string | null
   image?: string | null
   role?: $Enums.UserRole
+  mobileTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   tickets?: Prisma.TicketUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionUncheckedCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionUncheckedCreateNestedManyWithoutTargetInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -572,53 +916,93 @@ export type UserUpdateToOneWithWhereWithoutSessionsInput = {
 export type UserUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   tickets?: Prisma.TicketUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUpdateManyWithoutTargetNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   tickets?: Prisma.TicketUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUncheckedUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUncheckedUpdateManyWithoutTargetNestedInput
 }
 
 export type UserCreateWithoutTicketsInput = {
   id?: string
   name?: string | null
-  email: string
+  email?: string | null
   emailVerified?: Date | string | null
   image?: string | null
   role?: $Enums.UserRole
+  mobileTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
   accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionCreateNestedManyWithoutTargetInput
 }
 
 export type UserUncheckedCreateWithoutTicketsInput = {
   id?: string
   name?: string | null
-  email: string
+  email?: string | null
   emailVerified?: Date | string | null
   image?: string | null
   role?: $Enums.UserRole
+  mobileTokenVersion?: number
   createdAt?: Date | string
   updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
   accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionUncheckedCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionUncheckedCreateNestedManyWithoutTargetInput
 }
 
 export type UserCreateOrConnectWithoutTicketsInput = {
@@ -640,27 +1024,587 @@ export type UserUpdateToOneWithWhereWithoutTicketsInput = {
 export type UserUpdateWithoutTicketsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUpdateManyWithoutTargetNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTicketsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  email?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUncheckedUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUncheckedUpdateManyWithoutTargetNestedInput
+}
+
+export type UserCreateWithoutWalletInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  role?: $Enums.UserRole
+  mobileTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  tickets?: Prisma.TicketCreateNestedManyWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionCreateNestedManyWithoutTargetInput
+}
+
+export type UserUncheckedCreateWithoutWalletInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  role?: $Enums.UserRole
+  mobileTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  tickets?: Prisma.TicketUncheckedCreateNestedManyWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionUncheckedCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionUncheckedCreateNestedManyWithoutTargetInput
+}
+
+export type UserCreateOrConnectWithoutWalletInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutWalletInput, Prisma.UserUncheckedCreateWithoutWalletInput>
+}
+
+export type UserUpsertWithoutWalletInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutWalletInput, Prisma.UserUncheckedUpdateWithoutWalletInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutWalletInput, Prisma.UserUncheckedCreateWithoutWalletInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutWalletInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutWalletInput, Prisma.UserUncheckedUpdateWithoutWalletInput>
+}
+
+export type UserUpdateWithoutWalletInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  tickets?: Prisma.TicketUpdateManyWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUpdateManyWithoutTargetNestedInput
+}
+
+export type UserUncheckedUpdateWithoutWalletInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  tickets?: Prisma.TicketUncheckedUpdateManyWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUncheckedUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUncheckedUpdateManyWithoutTargetNestedInput
+}
+
+export type UserCreateWithoutDailyTicketsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  role?: $Enums.UserRole
+  mobileTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  tickets?: Prisma.TicketCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionCreateNestedManyWithoutTargetInput
+}
+
+export type UserUncheckedCreateWithoutDailyTicketsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  role?: $Enums.UserRole
+  mobileTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  tickets?: Prisma.TicketUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionUncheckedCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionUncheckedCreateNestedManyWithoutTargetInput
+}
+
+export type UserCreateOrConnectWithoutDailyTicketsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutDailyTicketsInput, Prisma.UserUncheckedCreateWithoutDailyTicketsInput>
+}
+
+export type UserUpsertWithoutDailyTicketsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutDailyTicketsInput, Prisma.UserUncheckedUpdateWithoutDailyTicketsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutDailyTicketsInput, Prisma.UserUncheckedCreateWithoutDailyTicketsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutDailyTicketsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutDailyTicketsInput, Prisma.UserUncheckedUpdateWithoutDailyTicketsInput>
+}
+
+export type UserUpdateWithoutDailyTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  tickets?: Prisma.TicketUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUpdateManyWithoutTargetNestedInput
+}
+
+export type UserUncheckedUpdateWithoutDailyTicketsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  tickets?: Prisma.TicketUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUncheckedUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUncheckedUpdateManyWithoutTargetNestedInput
+}
+
+export type UserCreateWithoutAdminActionsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  role?: $Enums.UserRole
+  mobileTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  tickets?: Prisma.TicketCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  adminTargeted?: Prisma.AdminActionCreateNestedManyWithoutTargetInput
+}
+
+export type UserUncheckedCreateWithoutAdminActionsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  role?: $Enums.UserRole
+  mobileTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  tickets?: Prisma.TicketUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  adminTargeted?: Prisma.AdminActionUncheckedCreateNestedManyWithoutTargetInput
+}
+
+export type UserCreateOrConnectWithoutAdminActionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminActionsInput, Prisma.UserUncheckedCreateWithoutAdminActionsInput>
+}
+
+export type UserCreateWithoutAdminTargetedInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  role?: $Enums.UserRole
+  mobileTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  tickets?: Prisma.TicketCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionCreateNestedManyWithoutAdminInput
+}
+
+export type UserUncheckedCreateWithoutAdminTargetedInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  role?: $Enums.UserRole
+  mobileTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  tickets?: Prisma.TicketUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketUncheckedCreateNestedManyWithoutUserInput
+  transactions?: Prisma.TransactionUncheckedCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionUncheckedCreateNestedManyWithoutAdminInput
+}
+
+export type UserCreateOrConnectWithoutAdminTargetedInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminTargetedInput, Prisma.UserUncheckedCreateWithoutAdminTargetedInput>
+}
+
+export type UserUpsertWithoutAdminActionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAdminActionsInput, Prisma.UserUncheckedUpdateWithoutAdminActionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminActionsInput, Prisma.UserUncheckedCreateWithoutAdminActionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAdminActionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAdminActionsInput, Prisma.UserUncheckedUpdateWithoutAdminActionsInput>
+}
+
+export type UserUpdateWithoutAdminActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  tickets?: Prisma.TicketUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  adminTargeted?: Prisma.AdminActionUpdateManyWithoutTargetNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAdminActionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  tickets?: Prisma.TicketUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  adminTargeted?: Prisma.AdminActionUncheckedUpdateManyWithoutTargetNestedInput
+}
+
+export type UserUpsertWithoutAdminTargetedInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutAdminTargetedInput, Prisma.UserUncheckedUpdateWithoutAdminTargetedInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutAdminTargetedInput, Prisma.UserUncheckedCreateWithoutAdminTargetedInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutAdminTargetedInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutAdminTargetedInput, Prisma.UserUncheckedUpdateWithoutAdminTargetedInput>
+}
+
+export type UserUpdateWithoutAdminTargetedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  tickets?: Prisma.TicketUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUpdateManyWithoutAdminNestedInput
+}
+
+export type UserUncheckedUpdateWithoutAdminTargetedInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  tickets?: Prisma.TicketUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUncheckedUpdateManyWithoutUserNestedInput
+  transactions?: Prisma.TransactionUncheckedUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUncheckedUpdateManyWithoutAdminNestedInput
+}
+
+export type UserCreateWithoutTransactionsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  role?: $Enums.UserRole
+  mobileTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
+  accounts?: Prisma.AccountCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  tickets?: Prisma.TicketCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionCreateNestedManyWithoutTargetInput
+}
+
+export type UserUncheckedCreateWithoutTransactionsInput = {
+  id?: string
+  name?: string | null
+  email?: string | null
+  emailVerified?: Date | string | null
+  image?: string | null
+  role?: $Enums.UserRole
+  mobileTokenVersion?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  phoneNumber?: string | null
+  phoneVerified?: boolean
+  kycLevel?: number
+  kycStatus?: string | null
+  accounts?: Prisma.AccountUncheckedCreateNestedManyWithoutUserInput
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  tickets?: Prisma.TicketUncheckedCreateNestedManyWithoutUserInput
+  wallet?: Prisma.WalletUncheckedCreateNestedOneWithoutUserInput
+  dailyTickets?: Prisma.DailyTicketUncheckedCreateNestedManyWithoutUserInput
+  adminActions?: Prisma.AdminActionUncheckedCreateNestedManyWithoutAdminInput
+  adminTargeted?: Prisma.AdminActionUncheckedCreateNestedManyWithoutTargetInput
+}
+
+export type UserCreateOrConnectWithoutTransactionsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTransactionsInput, Prisma.UserUncheckedCreateWithoutTransactionsInput>
+}
+
+export type UserUpsertWithoutTransactionsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTransactionsInput, Prisma.UserUncheckedUpdateWithoutTransactionsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTransactionsInput, Prisma.UserUncheckedCreateWithoutTransactionsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTransactionsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTransactionsInput, Prisma.UserUncheckedUpdateWithoutTransactionsInput>
+}
+
+export type UserUpdateWithoutTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  tickets?: Prisma.TicketUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUpdateManyWithoutTargetNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTransactionsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  emailVerified?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  image?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+  mobileTokenVersion?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  phoneNumber?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  phoneVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  kycLevel?: Prisma.IntFieldUpdateOperationsInput | number
+  kycStatus?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  accounts?: Prisma.AccountUncheckedUpdateManyWithoutUserNestedInput
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  tickets?: Prisma.TicketUncheckedUpdateManyWithoutUserNestedInput
+  wallet?: Prisma.WalletUncheckedUpdateOneWithoutUserNestedInput
+  dailyTickets?: Prisma.DailyTicketUncheckedUpdateManyWithoutUserNestedInput
+  adminActions?: Prisma.AdminActionUncheckedUpdateManyWithoutAdminNestedInput
+  adminTargeted?: Prisma.AdminActionUncheckedUpdateManyWithoutTargetNestedInput
 }
 
 
@@ -672,12 +1616,20 @@ export type UserCountOutputType = {
   accounts: number
   sessions: number
   tickets: number
+  dailyTickets: number
+  transactions: number
+  adminActions: number
+  adminTargeted: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | UserCountOutputTypeCountAccountsArgs
   sessions?: boolean | UserCountOutputTypeCountSessionsArgs
   tickets?: boolean | UserCountOutputTypeCountTicketsArgs
+  dailyTickets?: boolean | UserCountOutputTypeCountDailyTicketsArgs
+  transactions?: boolean | UserCountOutputTypeCountTransactionsArgs
+  adminActions?: boolean | UserCountOutputTypeCountAdminActionsArgs
+  adminTargeted?: boolean | UserCountOutputTypeCountAdminTargetedArgs
 }
 
 /**
@@ -711,6 +1663,34 @@ export type UserCountOutputTypeCountTicketsArgs<ExtArgs extends runtime.Types.Ex
   where?: Prisma.TicketWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountDailyTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.DailyTicketWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTransactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TransactionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAdminActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AdminActionWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAdminTargetedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AdminActionWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -719,11 +1699,21 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   emailVerified?: boolean
   image?: boolean
   role?: boolean
+  mobileTokenVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerified?: boolean
+  kycLevel?: boolean
+  kycStatus?: boolean
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   tickets?: boolean | Prisma.User$ticketsArgs<ExtArgs>
+  wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
+  dailyTickets?: boolean | Prisma.User$dailyTicketsArgs<ExtArgs>
+  transactions?: boolean | Prisma.User$transactionsArgs<ExtArgs>
+  adminActions?: boolean | Prisma.User$adminActionsArgs<ExtArgs>
+  adminTargeted?: boolean | Prisma.User$adminTargetedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -734,8 +1724,13 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailVerified?: boolean
   image?: boolean
   role?: boolean
+  mobileTokenVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerified?: boolean
+  kycLevel?: boolean
+  kycStatus?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -745,8 +1740,13 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   emailVerified?: boolean
   image?: boolean
   role?: boolean
+  mobileTokenVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerified?: boolean
+  kycLevel?: boolean
+  kycStatus?: boolean
 }, ExtArgs["result"]["user"]>
 
 export type UserSelectScalar = {
@@ -756,15 +1756,25 @@ export type UserSelectScalar = {
   emailVerified?: boolean
   image?: boolean
   role?: boolean
+  mobileTokenVersion?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  phoneNumber?: boolean
+  phoneVerified?: boolean
+  kycLevel?: boolean
+  kycStatus?: boolean
 }
 
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "email" | "emailVerified" | "image" | "role" | "mobileTokenVersion" | "createdAt" | "updatedAt" | "phoneNumber" | "phoneVerified" | "kycLevel" | "kycStatus", ExtArgs["result"]["user"]>
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   accounts?: boolean | Prisma.User$accountsArgs<ExtArgs>
   sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>
   tickets?: boolean | Prisma.User$ticketsArgs<ExtArgs>
+  wallet?: boolean | Prisma.User$walletArgs<ExtArgs>
+  dailyTickets?: boolean | Prisma.User$dailyTicketsArgs<ExtArgs>
+  transactions?: boolean | Prisma.User$transactionsArgs<ExtArgs>
+  adminActions?: boolean | Prisma.User$adminActionsArgs<ExtArgs>
+  adminTargeted?: boolean | Prisma.User$adminTargetedArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -776,16 +1786,26 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     accounts: Prisma.$AccountPayload<ExtArgs>[]
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     tickets: Prisma.$TicketPayload<ExtArgs>[]
+    wallet: Prisma.$WalletPayload<ExtArgs> | null
+    dailyTickets: Prisma.$DailyTicketPayload<ExtArgs>[]
+    transactions: Prisma.$TransactionPayload<ExtArgs>[]
+    adminActions: Prisma.$AdminActionPayload<ExtArgs>[]
+    adminTargeted: Prisma.$AdminActionPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     name: string | null
-    email: string
+    email: string | null
     emailVerified: Date | null
     image: string | null
     role: $Enums.UserRole
+    mobileTokenVersion: number
     createdAt: Date
     updatedAt: Date
+    phoneNumber: string | null
+    phoneVerified: boolean
+    kycLevel: number
+    kycStatus: string | null
   }, ExtArgs["result"]["user"]>
   composites: {}
 }
@@ -1183,6 +2203,11 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   accounts<T extends Prisma.User$accountsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$accountsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   tickets<T extends Prisma.User$ticketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ticketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  wallet<T extends Prisma.User$walletArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$walletArgs<ExtArgs>>): Prisma.Prisma__WalletClient<runtime.Types.Result.GetResult<Prisma.$WalletPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  dailyTickets<T extends Prisma.User$dailyTicketsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$dailyTicketsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$DailyTicketPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  transactions<T extends Prisma.User$transactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  adminActions<T extends Prisma.User$adminActionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminActionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  adminTargeted<T extends Prisma.User$adminTargetedArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$adminTargetedArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AdminActionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1218,8 +2243,13 @@ export interface UserFieldRefs {
   readonly emailVerified: Prisma.FieldRef<"User", 'DateTime'>
   readonly image: Prisma.FieldRef<"User", 'String'>
   readonly role: Prisma.FieldRef<"User", 'UserRole'>
+  readonly mobileTokenVersion: Prisma.FieldRef<"User", 'Int'>
   readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>
+  readonly phoneNumber: Prisma.FieldRef<"User", 'String'>
+  readonly phoneVerified: Prisma.FieldRef<"User", 'Boolean'>
+  readonly kycLevel: Prisma.FieldRef<"User", 'Int'>
+  readonly kycStatus: Prisma.FieldRef<"User", 'String'>
 }
     
 
@@ -1682,6 +2712,121 @@ export type User$ticketsArgs<ExtArgs extends runtime.Types.Extensions.InternalAr
   take?: number
   skip?: number
   distinct?: Prisma.TicketScalarFieldEnum | Prisma.TicketScalarFieldEnum[]
+}
+
+/**
+ * User.wallet
+ */
+export type User$walletArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Wallet
+   */
+  select?: Prisma.WalletSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Wallet
+   */
+  omit?: Prisma.WalletOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.WalletInclude<ExtArgs> | null
+  where?: Prisma.WalletWhereInput
+}
+
+/**
+ * User.dailyTickets
+ */
+export type User$dailyTicketsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the DailyTicket
+   */
+  select?: Prisma.DailyTicketSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the DailyTicket
+   */
+  omit?: Prisma.DailyTicketOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.DailyTicketInclude<ExtArgs> | null
+  where?: Prisma.DailyTicketWhereInput
+  orderBy?: Prisma.DailyTicketOrderByWithRelationInput | Prisma.DailyTicketOrderByWithRelationInput[]
+  cursor?: Prisma.DailyTicketWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.DailyTicketScalarFieldEnum | Prisma.DailyTicketScalarFieldEnum[]
+}
+
+/**
+ * User.transactions
+ */
+export type User$transactionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Transaction
+   */
+  select?: Prisma.TransactionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Transaction
+   */
+  omit?: Prisma.TransactionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TransactionInclude<ExtArgs> | null
+  where?: Prisma.TransactionWhereInput
+  orderBy?: Prisma.TransactionOrderByWithRelationInput | Prisma.TransactionOrderByWithRelationInput[]
+  cursor?: Prisma.TransactionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TransactionScalarFieldEnum | Prisma.TransactionScalarFieldEnum[]
+}
+
+/**
+ * User.adminActions
+ */
+export type User$adminActionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminAction
+   */
+  select?: Prisma.AdminActionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdminAction
+   */
+  omit?: Prisma.AdminActionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminActionInclude<ExtArgs> | null
+  where?: Prisma.AdminActionWhereInput
+  orderBy?: Prisma.AdminActionOrderByWithRelationInput | Prisma.AdminActionOrderByWithRelationInput[]
+  cursor?: Prisma.AdminActionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AdminActionScalarFieldEnum | Prisma.AdminActionScalarFieldEnum[]
+}
+
+/**
+ * User.adminTargeted
+ */
+export type User$adminTargetedArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AdminAction
+   */
+  select?: Prisma.AdminActionSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AdminAction
+   */
+  omit?: Prisma.AdminActionOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AdminActionInclude<ExtArgs> | null
+  where?: Prisma.AdminActionWhereInput
+  orderBy?: Prisma.AdminActionOrderByWithRelationInput | Prisma.AdminActionOrderByWithRelationInput[]
+  cursor?: Prisma.AdminActionWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AdminActionScalarFieldEnum | Prisma.AdminActionScalarFieldEnum[]
 }
 
 /**

@@ -34,7 +34,8 @@ export async function apiFetch<T>(
     headers.set("Authorization", `Bearer ${token}`);
   }
 
-  const response = await fetch(`${API_BASE_URL}${path}`, {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`;
+  const response = await fetch(`${API_BASE_URL}${normalizedPath}`, {
     ...options,
     headers,
   });
@@ -50,9 +51,13 @@ export async function apiFetch<T>(
 
 export type AppUser = {
   id: string;
-  email: string;
+  email: string | null;
   name: string | null;
   role: "USER" | "ADMIN";
+  phoneNumber: string | null;
+  phoneVerified: boolean;
+  kycLevel: number;
+  kycStatus: string | null;
 };
 
 export type LobbyGame = {
@@ -141,14 +146,109 @@ export type ProfileResponse = {
   }>;
 };
 
-// Auth API
-export async function signInWithGoogle(idToken: string): Promise<AppUser> {
-  const res = await apiFetch<{ user: AppUser; token: string }>("/api/auth/callback", {
+// ── Phone OTP Auth ──────────────────────────────────────────────────────
+
+export async function sendOTP(phoneNumber: string): Promise<{ success: boolean; message: string; demoCode?: string }> {
+  return apiFetch("/api/auth/phone/send-otp", {
     method: "POST",
-    body: JSON.stringify({ idToken }),
+    body: JSON.stringify({ phoneNumber }),
   });
+}
+
+export async function verifyOTP(
+  phoneNumber: string,
+  code: string,
+): Promise<{ user: AppUser; token: string; expiresAt: string }> {
+  const res = await apiFetch<{ user: AppUser; token: string; expiresAt: string }>(
+    "/api/auth/phone/verify-otp",
+    {
+      method: "POST",
+      body: JSON.stringify({ phoneNumber, code }),
+    },
+  );
   await setStoredToken(res.token);
-  return res.user;
+  return res;
+}
+
+// ── Lottery ──────────────────────────────────────────────────────────────
+
+export type LotteryResult = {
+  drawNumber: string;
+  drawDate: string;
+  ticketNumber: string;
+  winningNumber: string;
+};
+
+export async function fetchLatestLotteryResult(): Promise<LotteryResult | null> {
+  try {
+    const res = await apiFetch<{ drawNumber: string; drawDate: string; ticketNumber: string; winningNumber: string } | { result: null }>("/api/lottery/latest");
+    if ("result" in res && res.result === null) return null;
+    return res as LotteryResult;
+  } catch {
+    return null;
+  }
+}
+
+// ── Daily Game ───────────────────────────────────────────────────────────
+
+export type DailyGameData = {
+  id: string;
+  title: string;
+  entryFee: number;
+  prizeAmount: number;
+  maxPlayers: number;
+  currentPlayers: number;
+  endTime: string;
+  active: boolean;
+  processed: boolean;
+  winningNumber: string | null;
+};
+
+export type DailyTicketData = {
+  id: string;
+  gameId: string;
+  selectedNumber: string;
+  entryFee: number;
+  status: string;
+  prizeCredited: boolean;
+  createdAt: string;
+  game: {
+    title: string;
+    prizeAmount: number;
+    winningNumber: string | null;
+    processed: boolean;
+  };
+};
+
+export type WalletData = {
+  balance: number;
+  transactions: Array<{
+    id: string;
+    type: string;
+    amount: number;
+    balanceAfter: number;
+    description: string | null;
+    createdAt: string;
+  }>;
+};
+
+export async function fetchDailyGame(): Promise<DailyGameData> {
+  return apiFetch("/api/daily-game");
+}
+
+export async function enterDailyGame(selectedNumber: string): Promise<{ ticket: { id: string; selectedNumber: string; entryFee: number; status: string; createdAt: string }; balance: number }> {
+  return apiFetch("/api/daily-game", {
+    method: "POST",
+    body: JSON.stringify({ selectedNumber }),
+  });
+}
+
+export async function fetchMyTickets(): Promise<DailyTicketData[]> {
+  return apiFetch("/api/daily-game/tickets");
+}
+
+export async function fetchWallet(): Promise<WalletData> {
+  return apiFetch("/api/wallet");
 }
 
 export async function signOutUser(): Promise<void> {

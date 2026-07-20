@@ -10,7 +10,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <View className="flex-1 bg-[#09090B]">
+        <View className="flex-1 bg-[#0B0F14]">
           <StatusBar style="light" />
           <Slot />
         </View>

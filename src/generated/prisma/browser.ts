@@ -47,3 +47,38 @@ export type Game = Prisma.GameModel
  * 
  */
 export type Ticket = Prisma.TicketModel
+/**
+ * Model OtpCode
+ * 
+ */
+export type OtpCode = Prisma.OtpCodeModel
+/**
+ * Model LotteryResult
+ * 
+ */
+export type LotteryResult = Prisma.LotteryResultModel
+/**
+ * Model Wallet
+ * 
+ */
+export type Wallet = Prisma.WalletModel
+/**
+ * Model DailyGame
+ * 
+ */
+export type DailyGame = Prisma.DailyGameModel
+/**
+ * Model DailyTicket
+ * 
+ */
+export type DailyTicket = Prisma.DailyTicketModel
+/**
+ * Model AdminAction
+ * 
+ */
+export type AdminAction = Prisma.AdminActionModel
+/**
+ * Model Transaction
+ * 
+ */
+export type Transaction = Prisma.TransactionModel

@@ -56,7 +56,14 @@ export const ModelName = {
   Session: 'Session',
   VerificationToken: 'VerificationToken',
   Game: 'Game',
-  Ticket: 'Ticket'
+  Ticket: 'Ticket',
+  OtpCode: 'OtpCode',
+  LotteryResult: 'LotteryResult',
+  Wallet: 'Wallet',
+  DailyGame: 'DailyGame',
+  DailyTicket: 'DailyTicket',
+  AdminAction: 'AdminAction',
+  Transaction: 'Transaction'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -82,8 +89,13 @@ export const UserScalarFieldEnum = {
   emailVerified: 'emailVerified',
   image: 'image',
   role: 'role',
+  mobileTokenVersion: 'mobileTokenVersion',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  phoneNumber: 'phoneNumber',
+  phoneVerified: 'phoneVerified',
+  kycLevel: 'kycLevel',
+  kycStatus: 'kycStatus'
 } as const
 
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -160,12 +172,119 @@ export const TicketScalarFieldEnum = {
 export type TicketScalarFieldEnum = (typeof TicketScalarFieldEnum)[keyof typeof TicketScalarFieldEnum]
 
 
+export const OtpCodeScalarFieldEnum = {
+  id: 'id',
+  phoneNumber: 'phoneNumber',
+  code: 'code',
+  expiresAt: 'expiresAt',
+  used: 'used',
+  attempts: 'attempts',
+  ipAddress: 'ipAddress',
+  createdAt: 'createdAt'
+} as const
+
+export type OtpCodeScalarFieldEnum = (typeof OtpCodeScalarFieldEnum)[keyof typeof OtpCodeScalarFieldEnum]
+
+
+export const LotteryResultScalarFieldEnum = {
+  id: 'id',
+  drawNumber: 'drawNumber',
+  drawDate: 'drawDate',
+  ticketNumber: 'ticketNumber',
+  winningNumber: 'winningNumber',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type LotteryResultScalarFieldEnum = (typeof LotteryResultScalarFieldEnum)[keyof typeof LotteryResultScalarFieldEnum]
+
+
+export const WalletScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  balance: 'balance',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type WalletScalarFieldEnum = (typeof WalletScalarFieldEnum)[keyof typeof WalletScalarFieldEnum]
+
+
+export const DailyGameScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  entryFee: 'entryFee',
+  prizeAmount: 'prizeAmount',
+  maxPlayers: 'maxPlayers',
+  currentPlayers: 'currentPlayers',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  active: 'active',
+  processed: 'processed',
+  winningNumber: 'winningNumber',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type DailyGameScalarFieldEnum = (typeof DailyGameScalarFieldEnum)[keyof typeof DailyGameScalarFieldEnum]
+
+
+export const DailyTicketScalarFieldEnum = {
+  id: 'id',
+  gameId: 'gameId',
+  userId: 'userId',
+  selectedNumber: 'selectedNumber',
+  entryFee: 'entryFee',
+  status: 'status',
+  prizeCredited: 'prizeCredited',
+  createdAt: 'createdAt'
+} as const
+
+export type DailyTicketScalarFieldEnum = (typeof DailyTicketScalarFieldEnum)[keyof typeof DailyTicketScalarFieldEnum]
+
+
+export const AdminActionScalarFieldEnum = {
+  id: 'id',
+  adminUserId: 'adminUserId',
+  actionType: 'actionType',
+  targetUserId: 'targetUserId',
+  description: 'description',
+  metadata: 'metadata',
+  createdAt: 'createdAt'
+} as const
+
+export type AdminActionScalarFieldEnum = (typeof AdminActionScalarFieldEnum)[keyof typeof AdminActionScalarFieldEnum]
+
+
+export const TransactionScalarFieldEnum = {
+  id: 'id',
+  walletId: 'walletId',
+  userId: 'userId',
+  type: 'type',
+  amount: 'amount',
+  balanceAfter: 'balanceAfter',
+  description: 'description',
+  referenceId: 'referenceId',
+  createdAt: 'createdAt'
+} as const
+
+export type TransactionScalarFieldEnum = (typeof TransactionScalarFieldEnum)[keyof typeof TransactionScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+export const NullableJsonNullValueInput = {
+  DbNull: DbNull,
+  JsonNull: JsonNull
+} as const
+
+export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
 export const QueryMode = {
@@ -182,4 +301,13 @@ export const NullsOrder = {
 } as const
 
 export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+export const JsonNullValueFilter = {
+  DbNull: DbNull,
+  JsonNull: JsonNull,
+  AnyNull: AnyNull
+} as const
+
+export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 

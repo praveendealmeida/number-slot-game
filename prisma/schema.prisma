@@ -39,16 +39,32 @@ enum TicketOutcome {
 model User {
   id            String    @id @default(cuid())
   name          String?
-  email         String    @unique
+  email         String?   @unique
   emailVerified DateTime? @map("email_verified")
   image         String?
   role          UserRole  @default(USER)
+  // Bumped to invalidate all previously-issued mobile session tokens (e.g.
+  // "sign out of all devices", or a security-relevant account change).
+  // Mobile JWTs embed the version that was current when they were issued;
+  // a mismatch means the token is treated as revoked even if unexpired.
+  mobileTokenVersion Int  @default(0) @map("mobile_token_version")
   createdAt     DateTime  @default(now()) @map("created_at")
   updatedAt     DateTime  @updatedAt @map("updated_at")
 
-  accounts Account[]
-  sessions Session[]
-  tickets  Ticket[]
+  // Phone authentication
+  phoneNumber   String?   @unique @map("phone_number")
+  phoneVerified Boolean   @default(false) @map("phone_verified")
+  kycLevel      Int       @default(0) @map("kyc_level")
+  kycStatus     String?   @map("kyc_status")
+
+  accounts       Account[]
+  sessions       Session[]
+  tickets        Ticket[]
+  wallet         Wallet?
+  dailyTickets   DailyTicket[]
+  transactions   Transaction[]
+  adminActions   AdminAction[]    @relation("AdminActions")
+  adminTargeted  AdminAction[]    @relation("AdminTargets")
 
   @@map("users")
 }
@@ -141,4 +157,139 @@ model Ticket {
   @@index([userId, createdAt(sort: Desc)])
   @@index([gameId])
   @@map("tickets")
+}
+
+// ---------------------------------------------------------------------------
+// Phone OTP authentication
+// ---------------------------------------------------------------------------
+
+model OtpCode {
+  id          String   @id @default(cuid())
+  phoneNumber String   @map("phone_number")
+  code        String
+  expiresAt   DateTime @map("expires_at")
+  used        Boolean  @default(false)
+  attempts    Int      @default(0)
+  ipAddress   String?  @map("ip_address")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  @@index([phoneNumber, createdAt(sort: Desc)])
+  @@map("otp_codes")
+}
+
+// ---------------------------------------------------------------------------
+// Mahajana Sampatha Daily Lottery Result
+// ---------------------------------------------------------------------------
+
+model LotteryResult {
+  id            String   @id @default(cuid())
+  drawNumber    String   @unique @map("draw_number")
+  drawDate      DateTime @map("draw_date")
+  ticketNumber  String   @map("ticket_number")
+  winningNumber String   @map("winning_number")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("lottery_results")
+}
+
+// ---------------------------------------------------------------------------
+// Wallet
+// ---------------------------------------------------------------------------
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique @map("user_id")
+  balance   Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+
+  @@map("wallets")
+}
+
+// ---------------------------------------------------------------------------
+// Daily Number Game (Mahajana Sampatha last-2-digits prediction)
+// ---------------------------------------------------------------------------
+
+model DailyGame {
+  id            String   @id @default(cuid())
+  title         String   @default("Daily Number")
+  entryFee      Int      @default(100) @map("entry_fee") // in LKR cents
+  prizeAmount   Int      @default(10000) @map("prize_amount") // in LKR cents
+  maxPlayers    Int      @default(100) @map("max_players")
+  currentPlayers Int     @default(0) @map("current_players")
+  startTime     DateTime @default(now()) @map("start_time")
+  endTime       DateTime @map("end_time")
+  active        Boolean  @default(true)
+  processed     Boolean  @default(false)
+  winningNumber String?  @map("winning_number") // set when processed
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  tickets DailyTicket[]
+
+  @@index([active, endTime])
+  @@map("daily_games")
+}
+
+model DailyTicket {
+  id             String   @id @default(cuid())
+  gameId         String   @map("game_id")
+  userId         String   @map("user_id")
+  selectedNumber String   @map("selected_number") // "00" - "99"
+  entryFee       Int      @map("entry_fee")
+  status         String   @default("ACTIVE") // ACTIVE | WON | LOST
+  prizeCredited  Boolean  @default(false) @map("prize_credited")
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  game DailyGame @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, userId]) // one pick per user per game
+  @@index([gameId])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("daily_tickets")
+}
+
+// ---------------------------------------------------------------------------
+// Wallet Transactions
+// ---------------------------------------------------------------------------
+
+model AdminAction {
+  id           String   @id @default(cuid())
+  adminUserId  String   @map("admin_user_id")
+  actionType   String   @map("action_type") // WALLET_ADJUSTMENT | USER_DISABLED | KYC_APPROVED | KYC_REJECTED | WINNERS_PROCESSED | GAME_CREATED | GAME_UPDATED
+  targetUserId String?  @map("target_user_id")
+  description  String
+  metadata     Json?
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  admin  User  @relation("AdminActions", fields: [adminUserId], references: [id], onDelete: Cascade)
+  target User? @relation("AdminTargets", fields: [targetUserId], references: [id], onDelete: SetNull)
+
+  @@index([adminUserId, createdAt(sort: Desc)])
+  @@index([targetUserId])
+  @@map("admin_actions")
+}
+
+model Transaction {
+  id             String   @id @default(cuid())
+  walletId       String   @map("wallet_id")
+  userId         String   @map("user_id")
+  type           String   // DEPOSIT | WITHDRAW | GAME_ENTRY | WINNING | BONUS
+  amount         Int      // positive = credit, negative = debit
+  balanceAfter   Int      @map("balance_after")
+  description    String?
+  referenceId    String?  @map("reference_id") // gameId or ticketId
+  createdAt      DateTime @default(now()) @map("created_at")
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([walletId, createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("transactions")
 }

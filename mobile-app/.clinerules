@@ -1,0 +1,12 @@
+You are working on a production application.
+
+Rules:
+
+1. Never read node_modules.
+2. Never scan the entire project unless required.
+3. Inspect only relevant files.
+4. Before making changes explain the plan.
+5. Make small targeted changes.
+6. Do not rewrite working code.
+7. Ask before deleting files.
+8. Keep responses concise.
