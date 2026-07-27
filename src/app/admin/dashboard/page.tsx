@@ -42,7 +42,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-extrabold text-[#F8F9FA] mb-6">Dashboard</h1>
+      <h1 className="text-2xl font-extrabold text-[#F8F9FA] mb-2">Dashboard</h1>
+      <p className="text-sm text-[#6B7280] mb-6">
+        <Link href="/admin/games" className="text-[#8338EC] hover:underline">Games</Link>
+        {" · "}
+        <Link href="/admin/users" className="text-[#8338EC] hover:underline">Users</Link>
+        {" · "}
+        <Link href="/admin/daily-games" className="text-[#8338EC] hover:underline">Daily Games</Link>
+      </p>
 
       {loading ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

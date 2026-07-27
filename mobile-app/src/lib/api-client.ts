@@ -1,6 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API_BASE_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000";
+// Strip trailing slash so we never produce double-slashes (e.g. ...:3000//api/...)
+// which would trigger a 301 redirect that breaks CORS preflight.
+const rawBaseUrl = process.env.EXPO_PUBLIC_API_URL || "http://localhost:3000";
+const API_BASE_URL = rawBaseUrl.replace(/\/+$/, "");
 const TOKEN_KEY = "auth_token";
 
 export async function getStoredToken(): Promise<string | null> {

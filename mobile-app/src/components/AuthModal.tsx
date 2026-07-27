@@ -119,7 +119,7 @@ export default function AuthModal({ visible, onClose, onSuccess }: AuthModalProp
         <View className="flex-1 px-6 justify-center">
           {/* Close button */}
           <TouchableOpacity onPress={handleClose} className="absolute top-12 right-6 z-10">
-            <Text className="text-[#A0A4B8] text-sm">Cancel</Text>
+            <Text className="text-[#D1D5DB] text-sm">Cancel</Text>
           </TouchableOpacity>
 
           {step === "phone" ? (
@@ -127,7 +127,7 @@ export default function AuthModal({ visible, onClose, onSuccess }: AuthModalProp
               <Text className="text-[#F8F9FA] text-2xl font-extrabold text-center mb-2">
                 Enter your mobile number
               </Text>
-              <Text className="text-[#A0A4B8] text-sm text-center mb-8">
+              <Text className="text-[#D1D5DB] text-sm text-center mb-8">
                 Sign in to play and win
               </Text>
               <View className="flex-row items-center bg-[#1A202C] rounded-2xl border border-[#1E293B] px-4 h-16 mb-6">
@@ -146,8 +146,8 @@ export default function AuthModal({ visible, onClose, onSuccess }: AuthModalProp
                 />
               </View>
               {error && (
-                <View className="mb-4 px-4 py-3 bg-red-500/10 rounded-xl border border-red-500/20">
-                  <Text className="text-red-400 text-sm text-center">{error}</Text>
+                <View className="mb-4 px-4 py-3 bg-[#EF4444]/10 rounded-xl border border-[#EF4444]/20">
+                  <Text className="text-[#EF4444] text-sm text-center">{error}</Text>
                 </View>
               )}
               <TouchableOpacity
@@ -168,7 +168,7 @@ export default function AuthModal({ visible, onClose, onSuccess }: AuthModalProp
               <Text className="text-[#F8F9FA] text-2xl font-extrabold text-center mb-2">
                 Verify OTP
               </Text>
-              <Text className="text-[#A0A4B8] text-sm text-center mb-2">
+              <Text className="text-[#D1D5DB] text-sm text-center mb-2">
                 Code sent to {maskedPhone}
               </Text>
               {demoCode && (
@@ -198,20 +198,20 @@ export default function AuthModal({ visible, onClose, onSuccess }: AuthModalProp
               </View>
 
               {error && (
-                <View className="mb-4 px-4 py-3 bg-red-500/10 rounded-xl border border-red-500/20">
-                  <Text className="text-red-400 text-sm text-center">{error}</Text>
+                <View className="mb-4 px-4 py-3 bg-[#EF4444]/10 rounded-xl border border-[#EF4444]/20">
+                  <Text className="text-[#EF4444] text-sm text-center">{error}</Text>
                 </View>
               )}
 
               {loading && (
                 <View className="mb-4 items-center">
                   <ActivityIndicator color="#F5C542" />
-                  <Text className="text-[#A0A4B8] text-sm mt-2">Verifying...</Text>
+                  <Text className="text-[#D1D5DB] text-sm mt-2">Verifying...</Text>
                 </View>
               )}
 
               <TouchableOpacity onPress={() => setStep("phone")} className="items-center">
-                <Text className="text-[#A0A4B8] text-sm">Change number</Text>
+                <Text className="text-[#D1D5DB] text-sm">Change number</Text>
               </TouchableOpacity>
             </>
           )}

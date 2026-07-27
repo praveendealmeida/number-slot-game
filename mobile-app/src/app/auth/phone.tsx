@@ -15,7 +15,7 @@ import { sendOTP } from "@/lib/api-client";
 export default function PhoneAuthScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ redirect?: string }>();
-  const redirectTarget = params.redirect || "/lobby";
+  const redirectTarget = params.redirect || "/(tabs)";
 
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
@@ -94,7 +94,7 @@ export default function PhoneAuthScreen() {
             <Text className="text-[#FAFAFA] text-3xl font-extrabold text-center">
               Enter your{"\n"}mobile number
             </Text>
-            <Text className="text-[#A1A1AA] text-sm mt-3 text-center">
+            <Text className="text-[#D1D5DB] text-sm mt-3 text-center">
               We'll send you a verification code
             </Text>
           </View>
@@ -131,8 +131,8 @@ export default function PhoneAuthScreen() {
 
           {/* Error */}
           {error && (
-            <View className="mb-4 px-4 py-3 bg-red-500/10 rounded-xl border border-red-500/20">
-              <Text className="text-red-400 text-sm text-center">{error}</Text>
+            <View className="mb-4 px-4 py-3 bg-[#EF4444]/10 rounded-xl border border-[#EF4444]/20">
+              <Text className="text-[#EF4444] text-sm text-center">{error}</Text>
             </View>
           )}
 
@@ -161,7 +161,7 @@ export default function PhoneAuthScreen() {
             onPress={() => router.back()}
             className="mt-6 items-center"
           >
-            <Text className="text-[#A1A1AA] text-sm">Cancel</Text>
+            <Text className="text-[#D1D5DB] text-sm">Cancel</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

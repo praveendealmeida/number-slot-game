@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { View, Text, ScrollView, RefreshControl } from "react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
-import { fetchLatestLotteryResult, LotteryResult } from "@/lib/api-client";
+import { fetchLatestLotteryResult, LotteryResult, apiFetch, LobbyGame, LobbyResponse } from "@/lib/api-client";
+import { formatRs } from "@/lib/format";
 import Hero3D from "@/components/Hero3D";
 import JackpotCard from "@/components/JackpotCard";
 import LotteryResultCard from "@/components/LotteryResultCard";
@@ -19,28 +20,38 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [lotteryResult, setLotteryResult] = useState<LotteryResult | null>(null);
   const [lotteryLoading, setLotteryLoading] = useState(true);
+  const [lobbyData, setLobbyData] = useState<LobbyResponse | null>(null);
+  const [gamesLoading, setGamesLoading] = useState(true);
 
-  const loadLottery = useCallback(async () => {
-    const result = await fetchLatestLotteryResult();
-    setLotteryResult(result);
+  const loadAll = useCallback(async () => {
+    const [lottery, lobby] = await Promise.all([
+      fetchLatestLotteryResult(),
+      apiFetch<LobbyResponse>("/api/games").catch(() => null),
+    ]);
+    setLotteryResult(lottery);
+    setLobbyData(lobby);
     setLotteryLoading(false);
+    setGamesLoading(false);
   }, []);
 
   useEffect(() => {
-    loadLottery();
-  }, [loadLottery]);
+    loadAll();
+  }, [loadAll]);
 
-  const handlePlay = () => {
+  const handlePlay = (gameId?: string) => {
     if (!isAuthenticated) {
       setShowAuth(true);
       return;
     }
-    router.push("/lobby");
+    if (gameId) {
+      router.push(`/games/${gameId}`);
+    } else {
+      router.push("/game/daily-number");
+    }
   };
 
   const handleAuthSuccess = () => {
     setShowAuth(false);
-    router.push("/lobby");
   };
 
   const handleLotteryPress = () => {
@@ -53,15 +64,19 @@ export default function HomeScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadLottery();
+    await loadAll();
     setRefreshing(false);
   };
 
-  // Format the ISO date to readable format
   const formatDate = (iso: string): string => {
     const d = new Date(iso);
     return d.toLocaleDateString("en-LK", { day: "numeric", month: "long", year: "numeric" });
   };
+
+  // Get open games sorted by price
+  const openGames = lobbyData?.games
+    .filter((g) => g.status === "OPEN")
+    .sort((a, b) => a.ticketPrice - b.ticketPrice) ?? [];
 
   return (
     <View className="flex-1 bg-[#0B0F14]">
@@ -82,8 +97,8 @@ export default function HomeScreen() {
 
         {/* 2. Play Now CTA */}
         <View className="px-5 mb-6">
-          <AnimatedButton onPress={handlePlay} variant="orange" size="lg" className="w-full">
-            {isAuthenticated ? "Play Now" : "Sign in to Play"}
+          <AnimatedButton onPress={() => handlePlay()} variant="orange" size="lg" className="w-full">
+            {isAuthenticated ? "Play Today's Number" : "Sign in to Play"}
           </AnimatedButton>
         </View>
 
@@ -108,42 +123,43 @@ export default function HomeScreen() {
           ) : null}
         </View>
 
-        {/* 5. Game Cards */}
+        {/* 5. Real Game Cards from API */}
         <View className="px-5 mb-6">
           <View className="flex-row items-center justify-between mb-4">
-            <Text className="text-[#F8F9FA] text-lg font-extrabold">Available Games</Text>
-            <Text className="text-[#8338EC] text-sm font-bold">See All</Text>
+            <Text className="text-[#F8F9FA] text-lg font-extrabold">Today's Games</Text>
+            <Text className="text-[#8338EC] text-sm font-bold">
+              {openGames.length} open
+            </Text>
           </View>
 
-          <View className="gap-4">
-            <GameCard
-              title="Lucky Number 00-99"
-              entryFee="Rs 100"
-              prize="Rs 10,000"
-              players={67}
-              maxPlayers={100}
-              timeLeft="2h 15m"
-              onPlay={handlePlay}
-            />
-            <GameCard
-              title="Lucky Number 00-99"
-              entryFee="Rs 500"
-              prize="Rs 50,000"
-              players={34}
-              maxPlayers={100}
-              timeLeft="5h 42m"
-              onPlay={handlePlay}
-            />
-            <GameCard
-              title="Lucky Number 00-99"
-              entryFee="Rs 1000"
-              prize="Rs 100,000"
-              players={12}
-              maxPlayers={100}
-              timeLeft="8h 10m"
-              onPlay={handlePlay}
-            />
-          </View>
+          {gamesLoading ? (
+            <View className="gap-4">
+              {[1, 2, 3].map((i) => (
+                <Skeleton key={i} className="h-40 rounded-2xl bg-[#1A202C]" />
+              ))}
+            </View>
+          ) : openGames.length > 0 ? (
+            <View className="gap-4">
+              {openGames.map((game) => (
+                <GameCard
+                  key={game.id}
+                  title={game.title}
+                  entryFee={`Rs ${game.ticketPrice}`}
+                  prize={`Rs ${Math.floor(game.ticketPrice * 100 * 0.7).toLocaleString()}`}
+                  players={game.soldCount}
+                  maxPlayers={100}
+                  timeLeft={game.status === "OPEN" ? "Until 7 PM" : game.status}
+                  onPlay={() => handlePlay(game.id)}
+                />
+              ))}
+            </View>
+          ) : (
+            <View className="rounded-2xl border border-[#1E293B] bg-[#1A202C] p-6 items-center">
+              <Text className="text-[#6B7280] text-sm text-center">
+                No games open right now.{'\n'}New games start at 12 PM daily.
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* 6. Winners */}

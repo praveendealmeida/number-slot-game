@@ -3,12 +3,16 @@ import { prisma } from "@/lib/db";
 import { WINNER_PAYOUT_PERCENT } from "@/lib/payout";
 import { TOTAL_SLOTS } from "@/lib/slots";
 import { NextResponse } from "next/server";
+import { seedDailyTierGames } from "@/services/game-seeder";
 
 function jsonError(message: string, status: number) {
   return NextResponse.json({ error: message }, { status });
 }
 
 export async function GET() {
+  // Auto-seed 5 tier games if none exist (safety net for local dev)
+  await seedDailyTierGames().catch(() => undefined);
+
   const games = await prisma.game.findMany({
     orderBy: [{ ticketPrice: "asc" }, { createdAt: "desc" }],
     include: {

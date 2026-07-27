@@ -18,7 +18,7 @@ export default function VerifyOTPScreen() {
   const router = useRouter();
   const params = useLocalSearchParams<{ phone?: string; redirect?: string }>();
   const phone = params.phone || "";
-  const redirectTarget = params.redirect || "/lobby";
+  const redirectTarget = params.redirect || "/(tabs)";
 
   const { loginWithPhone } = useAuth();
 
@@ -125,7 +125,7 @@ export default function VerifyOTPScreen() {
             <Text className="text-[#FAFAFA] text-3xl font-extrabold text-center">
               Verify OTP
             </Text>
-            <Text className="text-[#A1A1AA] text-sm mt-3 text-center">
+            <Text className="text-[#D1D5DB] text-sm mt-3 text-center">
               Enter the 6-digit code sent to{"\n"}
               <Text className="text-[#C4B5FD] font-medium">{maskedPhone}</Text>
             </Text>
@@ -169,14 +169,14 @@ export default function VerifyOTPScreen() {
           {loading && (
             <View className="mb-4 items-center">
               <ActivityIndicator color="#FACC15" />
-              <Text className="text-[#A1A1AA] text-sm mt-2">Verifying...</Text>
+              <Text className="text-[#D1D5DB] text-sm mt-2">Verifying...</Text>
             </View>
           )}
 
           {/* Error */}
           {error && (
-            <View className="mb-4 px-4 py-3 bg-red-500/10 rounded-xl border border-red-500/20">
-              <Text className="text-red-400 text-sm text-center">{error}</Text>
+            <View className="mb-4 px-4 py-3 bg-[#EF4444]/10 rounded-xl border border-[#EF4444]/20">
+              <Text className="text-[#EF4444] text-sm text-center">{error}</Text>
             </View>
           )}
 
@@ -205,7 +205,7 @@ export default function VerifyOTPScreen() {
             onPress={() => router.back()}
             className="items-center"
           >
-            <Text className="text-[#A1A1AA] text-sm">Change number</Text>
+            <Text className="text-[#D1D5DB] text-sm">Change number</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
