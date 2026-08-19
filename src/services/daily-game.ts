@@ -6,11 +6,23 @@ const DEMO_BALANCE = process.env.DEMO_MODE === "true" ? 5000_00 : 0; // in LKR c
 // ── Wallet helpers ───────────────────────────────────────────────────────
 
 export async function ensureWallet(userId: string) {
-  return prisma.wallet.upsert({
+  const wallet = await prisma.wallet.upsert({
     where: { userId },
     create: { userId, balance: DEMO_BALANCE },
     update: {},
   });
+
+  // Demo mode: if an existing wallet has 0 balance (e.g. created before
+  // DEMO_MODE was enabled, or a fresh user), top it up to the demo balance.
+  // Never reset a wallet that has real funds or has been spent.
+  if (DEMO_BALANCE > 0 && wallet.balance === 0) {
+    return prisma.wallet.update({
+      where: { id: wallet.id },
+      data: { balance: DEMO_BALANCE },
+    });
+  }
+
+  return wallet;
 }
 
 export async function getWallet(userId: string) {

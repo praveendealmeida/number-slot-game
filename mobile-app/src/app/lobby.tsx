@@ -1,4 +1,5 @@
-import { View, Text, ScrollView, SafeAreaView, Animated, RefreshControl } from "react-native";
+import { View, Text, ScrollView, Animated, RefreshControl } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "expo-router";
 import { GameCard } from "@/components/GameCard";

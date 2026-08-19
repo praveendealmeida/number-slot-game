@@ -152,7 +152,7 @@ export type ProfileResponse = {
 // ── Phone OTP Auth ──────────────────────────────────────────────────────
 
 export async function sendOTP(phoneNumber: string): Promise<{ success: boolean; message: string; demoCode?: string }> {
-  return apiFetch("/api/auth/phone/send-otp", {
+  return apiFetch("/api/auth/send-otp", {
     method: "POST",
     body: JSON.stringify({ phoneNumber }),
   });
@@ -163,7 +163,7 @@ export async function verifyOTP(
   code: string,
 ): Promise<{ user: AppUser; token: string; expiresAt: string }> {
   const res = await apiFetch<{ user: AppUser; token: string; expiresAt: string }>(
-    "/api/auth/phone/verify-otp",
+    "/api/auth/verify-otp",
     {
       method: "POST",
       body: JSON.stringify({ phoneNumber, code }),
