@@ -1,14 +1,6 @@
 import { Prisma, PrismaClient } from "@/generated/prisma/client";
 import { getCurrentUser } from "@/lib/auth";
-import { reservationCutoff } from "@/lib/checkout";
 import { prisma } from "@/lib/db";
-import {
-  GATEWAY_MAX,
-  PaymentError,
-  createChain2PayPayment,
-  lkrToCharge,
-  providerMinimum,
-} from "@/lib/payment";
 import {
   MAX_SLOT,
   MIN_SLOT,
@@ -29,14 +21,6 @@ type PurchaseBody = {
 
 function jsonError(message: string, status: number, extra?: Record<string, unknown>) {
   return NextResponse.json({ error: message, ...extra }, { status });
-}
-
-function appBaseUrl(): string {
-  return (
-    process.env.APP_URL ||
-    process.env.AUTH_URL ||
-    "http://localhost:3000"
-  ).replace(/\/$/, "");
 }
 
 export async function POST(
@@ -68,8 +52,11 @@ export async function POST(
   const reservationId = randomUUID();
 
   try {
-    // 1) Reserve the slots (PENDING) under a serializable lock — no network here.
-    const reservation = await prisma.$transaction(
+    // Demo payment sandbox: no external gateway. Slot reservation, wallet
+    // debit, and ticket creation all happen atomically in one transaction —
+    // a purchase either fully succeeds (tickets COMPLETED) or fully fails,
+    // no PENDING/held state and nothing to reconcile asynchronously.
+    const result = await prisma.$transaction(
       async (tx: Tx) => {
         const lockedGames = await tx.$queryRaw<Array<{ id: string }>>`
           SELECT id FROM games WHERE id = ${gameId} FOR UPDATE
@@ -87,25 +74,7 @@ export async function POST(
           throw new PurchaseError("This game is not open for ticket purchases.", 409);
         }
 
-        const cutoff = reservationCutoff();
-
-        // Release expired reservations on the requested slots so they can be reused.
-        await tx.ticket.deleteMany({
-          where: {
-            gameId,
-            paymentStatus: "PENDING",
-            createdAt: { lt: cutoff },
-            slotNumber: { in: slotNumbers },
-          },
-        });
-
-        const activeWhere = {
-          gameId,
-          OR: [
-            { paymentStatus: "COMPLETED" as const },
-            { paymentStatus: "PENDING" as const, createdAt: { gte: cutoff } },
-          ],
-        };
+        const activeWhere = { gameId, paymentStatus: "COMPLETED" as const };
 
         const activeCount = await tx.ticket.count({ where: activeWhere });
         const remaining = TOTAL_SLOTS - activeCount;
@@ -125,23 +94,36 @@ export async function POST(
           });
         }
 
+        // ticketPrice is in whole Rupees; wallet balance/transactions are in
+        // LKR cents (Rs 1 = 100), matching the daily-game wallet convention.
         const amountLkr = game.ticketPrice * slotNumbers.length;
-        const { amount, currency } = lkrToCharge(amountLkr);
-        const min = providerMinimum();
+        const amountCents = amountLkr * 100;
 
-        if (amount > GATEWAY_MAX) {
+        const wallet = await tx.wallet.findUnique({ where: { userId: user.id } });
+        if (!wallet || wallet.balance < amountCents) {
           throw new PurchaseError(
-            `This order (${currency} ${amount.toFixed(2)}) exceeds the gateway maximum of ${currency} ${GATEWAY_MAX}.`,
-            400,
+            `Insufficient wallet balance. You need Rs ${amountLkr.toLocaleString("en-IN")}.`,
+            402,
+            { balance: wallet?.balance ?? 0, required: amountCents },
           );
         }
-        if (amount < min) {
-          throw new PurchaseError(
-            `Card payments need a minimum of about ${currency} ${min.toFixed(2)}. This order is only ${currency} ${amount.toFixed(2)} — please select more slots.`,
-            400,
-            { minCharge: min, currency, amount },
-          );
-        }
+
+        const updatedWallet = await tx.wallet.update({
+          where: { id: wallet.id },
+          data: { balance: { decrement: amountCents } },
+        });
+
+        await tx.transaction.create({
+          data: {
+            walletId: wallet.id,
+            userId: user.id,
+            type: "TICKET_PURCHASE",
+            amount: -amountCents,
+            balanceAfter: updatedWallet.balance,
+            description: `${slotNumbers.length} slot(s) — game ${gameId}`,
+            referenceId: reservationId,
+          },
+        });
 
         await Promise.all(
           slotNumbers.map((slotNumber) =>
@@ -151,7 +133,7 @@ export async function POST(
                 userId: user.id,
                 slotNumber,
                 pricePaid: game.ticketPrice,
-                paymentStatus: "PENDING",
+                paymentStatus: "COMPLETED",
                 paymentRef: reservationId,
               },
               select: { id: true },
@@ -159,7 +141,15 @@ export async function POST(
           ),
         );
 
-        return { amountLkr, amount, currency };
+        const completed = activeCount + slotNumbers.length;
+        if (completed >= TOTAL_SLOTS) {
+          await tx.game.updateMany({
+            where: { id: gameId, status: "OPEN" },
+            data: { status: "CLOSED", closedAt: new Date() },
+          });
+        }
+
+        return { amountLkr, balance: updatedWallet.balance };
       },
       {
         isolationLevel: Prisma.TransactionIsolationLevel.Serializable,
@@ -168,51 +158,17 @@ export async function POST(
       },
     );
 
-    // 2) Create the hosted payment (network call, outside the DB transaction).
-    let payment;
-    try {
-      payment = await createChain2PayPayment({
-        amount: reservation.amount,
-        currency: reservation.currency,
-        callbackUrl: `${appBaseUrl()}/api/payments/chain2pay`,
-        customerEmail: user.email || undefined,
-        metadata: {
-          gameId,
-          userId: user.id,
-          reservationId,
-          slots: slotNumbers.join(","),
-        },
-      });
-    } catch (error) {
-      // Roll back the reservation so the slots aren't stuck.
-      await prisma.ticket.deleteMany({
-        where: { paymentRef: reservationId, paymentStatus: "PENDING" },
-      });
-      throw error;
-    }
-
-    // 3) Stamp the real gateway order id onto the reserved tickets.
-    await prisma.ticket.updateMany({
-      where: { paymentRef: reservationId },
-      data: { paymentRef: payment.orderId },
-    });
-
     return NextResponse.json(
       {
-        checkoutUrl: payment.checkoutUrl,
-        orderId: payment.orderId,
-        amount: reservation.amount,
-        currency: reservation.currency,
-        amountLkr: reservation.amountLkr,
+        success: true,
         slotNumbers,
+        amountLkr: result.amountLkr,
+        balance: result.balance,
       },
       { status: 201 },
     );
   } catch (error) {
     if (error instanceof PurchaseError) {
-      return jsonError(error.message, error.status, error.extra);
-    }
-    if (error instanceof PaymentError) {
       return jsonError(error.message, error.status, error.extra);
     }
     if (isUniqueConstraintError(error)) {
@@ -222,7 +178,7 @@ export async function POST(
       );
     }
     console.error("Ticket purchase failed:", error);
-    return jsonError("Unable to start the ticket purchase.", 500);
+    return jsonError("Unable to complete the ticket purchase.", 500);
   }
 }
 
@@ -265,24 +221,13 @@ export async function GET(
     return jsonError("Game not found.", 404);
   }
 
-  const cutoff = reservationCutoff();
   const tickets = await prisma.ticket.findMany({
-    where: {
-      gameId,
-      OR: [
-        { paymentStatus: "COMPLETED" },
-        { paymentStatus: "PENDING", createdAt: { gte: cutoff } },
-      ],
-    },
-    select: { slotNumber: true, userId: true, paymentStatus: true },
+    where: { gameId, paymentStatus: "COMPLETED" },
+    select: { slotNumber: true, userId: true },
     orderBy: { slotNumber: "asc" },
   });
 
-  const soldSlots = tickets.map((t) => ({
-    slotNumber: t.slotNumber,
-    userId: t.userId,
-    pending: t.paymentStatus === "PENDING",
-  }));
+  const soldSlots = tickets.map((t) => ({ slotNumber: t.slotNumber, userId: t.userId }));
   const soldCount = soldSlots.length;
 
   return NextResponse.json({

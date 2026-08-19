@@ -52,22 +52,14 @@ export type GameBoardResponse = {
   game: LobbyGame;
   soldCount: number;
   remainingSlots: number;
-  soldSlots: Array<{ slotNumber: number; userId: string; pending?: boolean }>;
+  soldSlots: Array<{ slotNumber: number; userId: string }>;
 };
 
-export type PurchaseInitResponse = {
-  checkoutUrl: string;
-  orderId: string;
-  amount: number;
-  currency: string;
+export type PurchaseResponse = {
+  success: true;
+  slotNumbers: number[];
   amountLkr: number;
-  slotNumbers: number[];
-};
-
-export type PaymentStatusResponse = {
-  status: "paid" | "pending" | "expired" | "not_found";
-  gameId: string | null;
-  slotNumbers: number[];
+  balance: number;
 };
 
 export type FinanceOverview = {

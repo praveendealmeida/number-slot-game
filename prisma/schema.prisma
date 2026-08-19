@@ -279,7 +279,7 @@ model Transaction {
   id             String   @id @default(cuid())
   walletId       String   @map("wallet_id")
   userId         String   @map("user_id")
-  type           String   // DEPOSIT | WITHDRAW | GAME_ENTRY | WINNING | BONUS
+  type           String   // DEPOSIT | WITHDRAW | GAME_ENTRY | WINNING | BONUS | TICKET_PURCHASE
   amount         Int      // positive = credit, negative = debit
   balanceAfter   Int      @map("balance_after")
   description    String?

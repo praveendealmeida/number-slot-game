@@ -16,10 +16,16 @@ works fine with Certbot's HTTP-01 challenge.
 
 - Have the real production secrets ready: `DATABASE_URL`, `AUTH_SECRET`,
   admin credentials, **Notify.lk keys with an approved (non-`NotifyDEMO`)
-  sender ID**, Chain2Pay live key, `CRON_SECRET`.
+  sender ID**, `CRON_SECRET`.
 - This runbook assumes Postgres runs locally on the same VPS. If you're using
   a managed Postgres instead, skip section 2 and just use its connection
   string for `DATABASE_URL`.
+- **Payments are a demo sandbox right now** — buying a ticket debits the
+  user's in-app wallet directly, no real gateway. If `DEMO_MODE=false` and
+  nobody credits wallets manually (admin dashboard → user → wallet
+  adjustment), users will have Rs 0 and can't buy anything. Either keep
+  `DEMO_MODE=true` for now, or plan to credit test wallets by hand, until a
+  real payment gateway is wired back in.
 
 ## 1. SSH in and install base packages
 
@@ -82,17 +88,13 @@ NOTIFY_LK_USER_ID="<your Notify.lk user id>"
 NOTIFY_LK_API_KEY="<your Notify.lk api key>"
 NOTIFY_LK_SENDER_ID="<your APPROVED sender id — NOT NotifyDEMO>"
 
-# Chain2Pay payments — LIVE key
-CHAIN2PAY_API_KEY="c2p_live_..."
-CHAIN2PAY_WEBHOOK_SECRET="<from Chain2Pay dashboard>"
-CHAIN2PAY_CURRENCY="USD"
-CHAIN2PAY_FIAT_PER_LKR="0.0033"
-CHAIN2PAY_MIN_AMOUNT="6"
-CHAIN2PAY_RESERVATION_MINUTES="20"
-
-# Public URL — used to build the Chain2Pay webhook callback and Auth.js base URL
-APP_URL="https://159.65.143.11.sslip.io"
+# Public URL — used as Auth.js's base URL
 AUTH_URL="https://159.65.143.11.sslip.io"
+
+# Payments: demo sandbox only — buying a ticket debits the user's in-app
+# wallet directly, no external gateway involved (see .env.example). Wallets
+# are funded via DEMO_MODE's Rs 5,000 top-up or manual admin credit until a
+# real payment gateway is wired in.
 
 # Cron auth — generate with: openssl rand -hex 24
 CRON_SECRET="<random string>"

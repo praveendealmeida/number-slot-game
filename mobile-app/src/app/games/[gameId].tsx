@@ -10,8 +10,7 @@ import { SlotGrid } from "@/components/SlotGrid";
 import { useAuth } from "@/context/AuthContext";
 import {
   GameBoardResponse,
-  PaymentStatusResponse,
-  PurchaseInitResponse,
+  PurchaseResponse,
   apiFetch,
 } from "@/lib/api-client";
 import { formatRs } from "@/lib/format";
@@ -52,9 +51,7 @@ export default function GameScreen() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [awaitingRef, setAwaitingRef] = useState<string | null>(null);
   const [showConfetti, setShowConfetti] = useState(false);
-  const pollDeadline = useRef<number>(0);
 
   // Premium animation refs
   const headerFade = useRef(new Animated.Value(0)).current;
@@ -134,44 +131,6 @@ export default function GameScreen() {
     return () => clearInterval(interval);
   }, [loadBoard]);
 
-  // Payment polling
-  useEffect(() => {
-    if (!awaitingRef) return;
-    pollDeadline.current = Date.now() + 10 * 60 * 1000;
-
-    const poll = async () => {
-      if (Date.now() > pollDeadline.current) {
-        setAwaitingRef(null);
-        setMessage(null);
-        setError("Still waiting on payment. Refresh this page once you've paid.");
-        return;
-      }
-      try {
-        const res = await apiFetch<PaymentStatusResponse>(
-          `/api/payments/status?ref=${encodeURIComponent(awaitingRef)}`,
-        );
-        if (res.status === "paid") {
-          setAwaitingRef(null);
-          setMessage("Payment confirmed — your slots are locked in. Good luck!");
-          setError(null);
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          setShowConfetti(true);
-          setTimeout(() => setShowConfetti(false), 4000);
-          await loadBoard();
-        } else if (res.status === "expired" || res.status === "not_found") {
-          setAwaitingRef(null);
-          setMessage(null);
-          setError("Payment wasn't completed and the slots were released.");
-          await loadBoard();
-        }
-      } catch { /* transient */ }
-    };
-
-    poll();
-    const interval = setInterval(poll, 4000);
-    return () => clearInterval(interval);
-  }, [awaitingRef, loadBoard]);
-
   // Derived state
   const soldSlots = board?.soldSlots.map((s) => s.slotNumber) ?? [];
   const soldSlotOwners = useMemo(() => {
@@ -186,7 +145,7 @@ export default function GameScreen() {
 
   const totalCost = board ? selected.length * board.game.ticketPrice : 0;
   const isOpen = board?.game.status === "OPEN";
-  const busy = submitting || awaitingRef !== null;
+  const busy = submitting;
 
   const potentialPrize = board
     ? Math.floor((board.game.ticketPrice * TOTAL_SLOTS * WINNER_PAYOUT_PERCENT) / 100)
@@ -221,18 +180,20 @@ export default function GameScreen() {
     setMessage(null);
 
     try {
-      const result = await apiFetch<PurchaseInitResponse>(`/api/games/${gameId}/tickets`, {
+      const result = await apiFetch<PurchaseResponse>(`/api/games/${gameId}/tickets`, {
         method: "POST",
         body: JSON.stringify({ slotNumbers: selected }),
       });
-      setAwaitingRef(result.orderId);
       setSelected([]);
       setMessage(
-        `Complete the ${result.currency} ${result.amount.toFixed(2)} payment in your browser. This screen updates automatically once confirmed.`,
+        `Paid ${formatRs(result.amountLkr)} from your wallet — your slots are locked in. Good luck!`,
       );
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      setShowConfetti(true);
+      setTimeout(() => setShowConfetti(false), 4000);
       await loadBoard();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not start checkout.");
+      setError(err instanceof Error ? err.message : "Could not complete the purchase.");
     } finally {
       setSubmitting(false);
     }
@@ -543,16 +504,14 @@ export default function GameScreen() {
                               letterSpacing: 0.3,
                             }}
                           >
-                            {awaitingRef
-                              ? "⏳ Waiting for payment..."
-                              : submitting
-                                ? "⏳ Starting checkout..."
-                                : `⚡ Buy ${selected.length || 0} Slot(s) — ${formatRs(totalCost)}`}
+                            {submitting
+                              ? "⏳ Processing..."
+                              : `⚡ Buy ${selected.length || 0} Slot(s) — ${formatRs(totalCost)}`}
                           </Text>
                         </View>
 
                         {/* Subtitle */}
-                        {selected.length > 0 && !busy && !awaitingRef && (
+                        {selected.length > 0 && !busy && (
                           <Text style={{
                             color: "rgba(26, 18, 0, 0.6)",
                             fontSize: 10,
