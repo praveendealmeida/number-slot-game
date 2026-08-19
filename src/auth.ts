@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/lib/db";
+import type { Role } from "../types/next-auth";
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   adapter: PrismaAdapter(
@@ -16,8 +17,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        const adminUsername = process.env.ADMIN_USERNAME ?? "praveendealmeida95";
-        const adminPassword = process.env.ADMIN_PASSWORD ?? "Buzz1234";
+        const adminUsername = process.env.ADMIN_USERNAME;
+        const adminPassword = process.env.ADMIN_PASSWORD;
+
+        // Fail closed if the admin credentials aren't configured — never
+        // fall back to a hardcoded default (it would ship in source control).
+        if (!adminUsername || !adminPassword) {
+          return null;
+        }
 
         if (
           credentials?.username === adminUsername &&
@@ -70,7 +77,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     session({ session, token }) {
       if (session.user) {
         session.user.id = token.id as string;
-        session.user.role = (token.role as string) ?? "USER";
+        session.user.role = (token.role as Role) ?? "USER";
       }
       return session;
     },

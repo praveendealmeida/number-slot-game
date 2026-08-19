@@ -12,7 +12,11 @@
         "buildType": "apk"
       }
     },
-    "production": {}
+    "production": {
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://159.65.143.11.sslip.io/"
+      }
+    }
   },
   "submit": {
     "production": {}

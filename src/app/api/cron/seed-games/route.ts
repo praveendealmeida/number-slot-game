@@ -1,10 +1,17 @@
 import { seedDailyTierGames } from "@/services/game-seeder";
 
-// POST /api/cron/seed-games — called by Vercel cron at 12 PM daily
-// Protected by CRON_SECRET header
-export async function POST(request: Request) {
-  const secret = request.headers.get("x-cron-secret");
-  if (secret !== process.env.CRON_SECRET) {
+// Invoked by Vercel Cron (see vercel.json). Vercel sends
+// `Authorization: Bearer <CRON_SECRET>` — set CRON_SECRET as an env var to match.
+function isAuthorized(request: Request): boolean {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) {
+    return false;
+  }
+  return request.headers.get("authorization") === `Bearer ${secret}`;
+}
+
+async function handle(request: Request) {
+  if (!isAuthorized(request)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -12,8 +19,10 @@ export async function POST(request: Request) {
   return Response.json({ success: true, ...result });
 }
 
-// GET endpoint for manual admin testing
-export async function GET() {
-  const result = await seedDailyTierGames();
-  return Response.json({ success: true, ...result });
+export async function GET(request: Request) {
+  return handle(request);
+}
+
+export async function POST(request: Request) {
+  return handle(request);
 }
